@@ -12,4 +12,4 @@ $(FLEX):
 	flex comments.lex
 
 clean:
-	rm -f *.out lex.yy.c
+	rm -f $(PROG) $(FLEX)

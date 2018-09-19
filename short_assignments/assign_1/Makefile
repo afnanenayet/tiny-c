@@ -1,12 +1,14 @@
 LIB="-L/usr/local/opt/flex/lib"
-LFLAGS = "-lfl"
+LFLAGS="-lfl"
+FLEX=lex.yy.c
+PROG=a.out
 
 .PHONY: all
 
-prog: lex
-	clang lex.yy.c $(LIB) $(LFLAGS)
+$(PROG): $(FLEX)
+	clang lex.yy.c $(LIB) $(LFLAGS) -O3 -o $(PROG)
 
-lex:
+$(FLEX):
 	flex comments.lex
 
 clean:

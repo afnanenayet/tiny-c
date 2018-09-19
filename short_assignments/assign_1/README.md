@@ -24,3 +24,17 @@ Should produce the following output:
 main function
 print function
 ```
+
+## Usage
+
+There is a Makefile included that can generate the program. It uses
+`clang` and `flex`. It assumes you have installed `flex` using Homebrew
+on MacOS.
+
+To generate the program:
+
+`make`
+
+To clean up:
+
+`make clean`

@@ -6,7 +6,7 @@ unsigned int line_count = 0;
 %}
 
 newline \n
-word    ([a-zA-Z0-9_])+
+word    ([a-zA-Z0-9])+
 
 %%
 

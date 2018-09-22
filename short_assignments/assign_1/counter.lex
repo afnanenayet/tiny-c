@@ -1,18 +1,17 @@
 %{
 #include <stdio.h>
-#include <string.h>
 
 unsigned int word_count = 0;
 unsigned int line_count = 0;
 %}
 
 newline \n
-word    ([a-zA-Z0-9_])*
+word    ([a-zA-Z0-9_])+
 
 %%
 
 {newline} {line_count++;}
-{word}   {word_count++;}
+{word}    {word_count++;}
 
 %%
 

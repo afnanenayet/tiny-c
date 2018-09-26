@@ -12,7 +12,7 @@ $(PROG): lex.yy.c $(SRC).tab.c
 	clang $^ $(LIB) $(LFLAGS) -O3 -std=c11 -Wall -Wpedantic -o $(PROG)
 
 lex.yy.c: $(SRC).l $(SRC).tab.h
-	$(LEX) calc2.l
+	$(LEX) $(SRC).l
 
 $(SRC).tab.h: $(SRC).y
 	$(YACC) -d $^

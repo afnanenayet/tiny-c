@@ -3,20 +3,22 @@ LFLAGS=-lfl
 PROG=a.out
 LEX=flex
 YACC=bison
+SRC=calc1
+
 
 .PHONY: all
 
-$(PROG): calc2.l lex.yy.c calc2.tab.c
+$(PROG): lex.yy.c $(SRC).tab.c
 	clang $^ $(LIB) $(LFLAGS) -O3 -std=c11 -Wall -Wpedantic -o $(PROG)
 
-lex.yy.c: calc2.l calc2.tab.h
+lex.yy.c: $(SRC).l $(SRC).tab.h
 	$(LEX) calc2.l
 
-calc2.tab.h: calc2.y
+$(SRC).tab.h: $(SRC).y
 	$(YACC) -d $^
 
-calc2.tab.c: calc2.y
+$(SRC).tab.c: $(SRC).y
 	$(YACC) -d $^
 
 clean:
-	rm -f lex.yy.c a.out calc2.tab.h calc2.tab.c
+	rm -f lex.yy.c a.out $(SRC).tab.h $(SRC).tab.c

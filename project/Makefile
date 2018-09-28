@@ -1,7 +1,10 @@
 # Makefile
 # Afnan Enayet 2018
+INCLUDE_DIR=include
+TEST_DIR=test
+
 CC=clang
-IFLAGS=-I include
+IFLAGS=-I $(INCLUDE_DIR)
 WFLAGS=-Wpedantic -Wall -std=c11
 
 # need this to use LLVM's stdlib
@@ -12,11 +15,13 @@ FLEXLD=-L/usr/local/opt/flex/lib
 
 .PHONY: all test
 
-test: test/test_compile.o
-	$(CC) $^ $(IFLAGS) $(LDFLAGS) $(WFLAGS)
+test: $(TEST_DIR)/a.out
 
-test/test_compile.o: test/test_compile.c
+$(TEST_DIR)/a.out: $(TEST_DIR)/test_compile.o
+	$(CC) $^ $(IFLAGS) $(LDFLAGS) $(WFLAGS) -o $(TEST_DIR)/a.out
+
+$(TEST_DIR)/test_compile.o: $(TEST_DIR)/test_compile.c
 	$(CC) $(IFLAGS) $^ -c -o $@
 
 clean:
-	rm -f test/*.o test/a.out  # test files
+	rm -f $(TEST_DIR)/*.o $(TEST_DIR)/a.out  # test files

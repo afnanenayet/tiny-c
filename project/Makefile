@@ -23,5 +23,7 @@ $(TEST_DIR)/a.out: $(TEST_DIR)/test_compile.o
 $(TEST_DIR)/test_compile.o: $(TEST_DIR)/test_compile.c
 	$(CC) $(IFLAGS) $^ -c -o $@
 
-clean:
+test_clean:
 	rm -f $(TEST_DIR)/*.o $(TEST_DIR)/a.out  # test files
+
+clean: test_clean

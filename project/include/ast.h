@@ -46,11 +46,25 @@ typedef enum {
   L_SHIFT,
 } b_op_t;
 
-// The definition for an AST node with a variable number of children.
-typedef struct {
-  type_t node_type;
-  struct ast_node_t *children;
-} ast_node_t;
+// valid operations for a unary operation
+typedef enum {
+  // increment (++)
+  INC,
+
+  // decrement (--)
+  DEC,
+
+  // not (!)
+  NOT,
+
+  // negative (-)
+  NEG,
+
+  // positive (just returns the value of the variable)
+  POS,
+} u_op_t;
+
+typedef struct ast_node_t;
 
 // A variable node
 typedef struct {
@@ -101,3 +115,10 @@ typedef struct {
   // the right hand side of the operation
   ast_node_t *rhs;
 } bexpr_n;
+
+// The definition for an AST node with a variable number of children.
+// Note: be sure to place this definition under all of the node data structs
+typedef struct {
+  type_t node_type;
+  struct ast_node_t *children;
+} ast_node_t;

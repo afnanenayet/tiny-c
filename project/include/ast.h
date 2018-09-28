@@ -64,7 +64,7 @@ typedef enum {
   POS,
 } u_op_t;
 
-typedef struct ast_node_t;
+struct ast_node_s;
 
 // A variable node
 typedef struct {
@@ -80,19 +80,19 @@ typedef struct {
 
 typedef struct {
   // the if-else condition
-  ast_node_t *cond;
+  struct ast_node_s *cond;
 
   // the if statement
-  ast_node_t *if_stmt;
+  struct ast_node_s *if_stmt;
 
   // the else statement
-  ast_node_t *else_stmt;
+  struct ast_node_s *else_stmt;
 } if_else_n;
 
 // the root node
 typedef struct {
   // main func
-  ast_node_t *main_n;
+  struct ast_node_s *main_n;
 } root;
 
 // the definition of a function
@@ -101,7 +101,7 @@ typedef struct {
   char *name;
 
   // the sequence that will be executed
-  ast_node_t *fn_seq;
+  struct ast_node_s *fn_seq;
 } func_n;
 
 // binary expression
@@ -110,15 +110,15 @@ typedef struct {
   b_op_t op;
 
   // the left hand side of the operation
-  ast_node_t *lhs;
+  struct ast_node_s *lhs;
 
   // the right hand side of the operation
-  ast_node_t *rhs;
+  struct ast_node_s *rhs;
 } bexpr_n;
 
 // The definition for an AST node with a variable number of children.
 // Note: be sure to place this definition under all of the node data structs
 typedef struct {
   type_t node_type;
-  struct ast_node_t *children;
+  struct ast_node_s *children;
 } ast_node_t;

@@ -147,6 +147,20 @@ typedef struct {
 } bexpr_n;
 
 /**
+ * \brief A union containing data for each node type.
+ *
+ * Each AST node has some data field that contains pertinent information
+ * relevant for each node type/operation/symbol.
+ */
+union node_data {
+    var_n var;
+    const_n constant;
+    if_else_n if_else;
+    func_n func;
+    bexpr_n b_expr;
+};
+
+/**
  * \brief The definition for an AST node with a variable number of children.
  *
  * This defines the type for an AST node. It consists of a type enum so the
@@ -159,8 +173,12 @@ typedef struct {
  * declare all of the structs in the union._
  */
 typedef struct {
+    /// An enum declaring the node type
     type_t node_type;
-    // TODO: add a union type with data that can take the structs defined above
+
+    /// Data relevant for the node type, if applicable.
+    union node_data data;
+
     /// The pointers to the child nodes of this node
     struct ast_node_s *children;
 } ast_node_t;

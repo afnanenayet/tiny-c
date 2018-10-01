@@ -6,37 +6,43 @@
 
 #pragma once
 
-// A enum that stores the possible types for each AST node.
+/**
+ * \brief A enum that stores the possible types for each AST node.
+ */
 typedef enum {
-  // variable
+  /// variable
   T_VAR,
 
-  // constant
+  /// constant
   T_CONST,
 
-  // if statement
+  /// if statement
   T_IF,
 
-  // else statement
+  /// else statement
   T_ELSE,
 
-  // while loop
+  /// while loop
   T_WHILE,
 
-  // declaration
+  /// declaration
   T_DECL,
 
-  // binary expression
+  /// binary expression
   T_BEXP,
 
-  // unary expression
+  /// unary expression
   T_UEXP,
 
-  // sequence
+  /// sequence
   T_SEQ,
 } type_t;
 
-// valid operations for a binary expression
+/**
+ * \brief Possible operations for a binary operation
+ *
+ * Valid operations for a binary operation, defined as an enum for convenience.
+ */
 typedef enum {
   PLUS,
   MINUS,
@@ -46,79 +52,115 @@ typedef enum {
   L_SHIFT,
 } b_op_t;
 
-// valid operations for a unary operation
+/**
+ * \brief Possible operations for a unary operation
+ *
+ * Valid operations for a unary operation, defined as an enum for convenience.
+ */
 typedef enum {
-  // increment (++)
+  /// increment operator `++`
   INC,
 
-  // decrement (--)
+  /// decrement operator `--`
   DEC,
 
-  // not (!)
+  /// not operator `!`
   NOT,
 
-  // negative (-)
+  /// negation operator `-`
   NEG,
 
-  // positive (just returns the value of the variable)
+  /// no-op, returns the value `+`
   POS,
 } u_op_t;
 
 struct ast_node_s;
 
-// A variable node
+/**
+ * \brief Data struct for a mutable variable.
+ *
+ * A data structure for a mutable variable. The data is an `int`.
+ */
 typedef struct {
-  // The data being stored. It is mutable.
+  /// The data being stored. It is mutable.
   int data;
 } var_n;
 
-// A const node
+/**
+ * \brief Data struct for a constant variable
+ */
 typedef struct {
-  // The data being stored, it is immutable.
+  /// The data being stored, it is immutable.
   const int constant;
 } const_n;
 
+/**
+ * \brief Data struct for an if/else construct
+ */
 typedef struct {
-  // the if-else condition
+  /// the if-else condition
   struct ast_node_s *cond;
 
-  // the if statement
+  /// the if statement
   struct ast_node_s *if_stmt;
 
-  // the else statement
+  /// the else statement
   struct ast_node_s *else_stmt;
 } if_else_n;
 
-// the root node
+/**
+ * \brief The root node, or global main.
+ *
+ * The root node is effectively a global main function.
+ */
 typedef struct {
-  // main func
+  /// main func
   struct ast_node_s *main_n;
 } root;
 
-// the definition of a function
+/**
+ * \brief Data struct for a function.
+ *
+ * A function only holds a name and a sequence (no arguments or other
+ * fancy things).
+ */
 typedef struct {
-  // the name of the function
+  /// the name of the function
   char *name;
 
-  // the sequence that will be executed
+  /// the sequence that will be executed
   struct ast_node_s *fn_seq;
 } func_n;
 
-// binary expression
+/**
+ * \brief Data struct for a binary expression.  
+ */
 typedef struct {
-  // the operation being applied to the binary expression
+  /// The operation being applied to the binary expression
   b_op_t op;
 
-  // the left hand side of the operation
+  /// The left hand side of the operation
   struct ast_node_s *lhs;
 
-  // the right hand side of the operation
+  /// The right hand side of the operation
   struct ast_node_s *rhs;
 } bexpr_n;
 
-// The definition for an AST node with a variable number of children.
-// Note: be sure to place this definition under all of the node data structs
+/**
+ * \brief The definition for an AST node with a variable number of children.
+ *
+ * This defines the type for an AST node. It consists of a type enum so the
+ * parser can discern what kind of data will be in the `data` field.
+ * The data field is a union consisting of various structs that contain
+ * relevant information for each operation.
+ *
+ * _Note: be sure to place this definition under all of the node data structs,
+ * otherwise it will be significantly more verbose as you will have to forward
+ * declare all of the structs in the union._
+ */
 typedef struct {
   type_t node_type;
+  // TODO: add a union type with data that can take the structs defined above
+  /// The pointers to the child nodes of this node
   struct ast_node_s *children;
 } ast_node_t;

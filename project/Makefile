@@ -13,7 +13,7 @@ LDFLAGS=-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib
 # link the flex libs
 FLEXLD=-L/usr/local/opt/flex/lib
 
-.PHONY: all test
+.PHONY: all test docs clean check
 
 test: $(TEST_DIR)/a.out
 
@@ -26,4 +26,10 @@ $(TEST_DIR)/test_compile.o: $(TEST_DIR)/test_compile.c
 test_clean:
 	rm -f $(TEST_DIR)/*.o $(TEST_DIR)/a.out  # test files
 
+check:
+	scan-build make
+
 clean: test_clean
+
+docs:
+	dox2html5 Doxyfile-mcss

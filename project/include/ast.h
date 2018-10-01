@@ -10,32 +10,32 @@
  * \brief A enum that stores the possible types for each AST node.
  */
 typedef enum {
-  /// variable
-  T_VAR,
+    /// variable
+    T_VAR,
 
-  /// constant
-  T_CONST,
+    /// constant
+    T_CONST,
 
-  /// if statement
-  T_IF,
+    /// if statement
+    T_IF,
 
-  /// else statement
-  T_ELSE,
+    /// else statement
+    T_ELSE,
 
-  /// while loop
-  T_WHILE,
+    /// while loop
+    T_WHILE,
 
-  /// declaration
-  T_DECL,
+    /// declaration
+    T_DECL,
 
-  /// binary expression
-  T_BEXP,
+    /// binary expression
+    T_BEXP,
 
-  /// unary expression
-  T_UEXP,
+    /// unary expression
+    T_UEXP,
 
-  /// sequence
-  T_SEQ,
+    /// sequence
+    T_SEQ,
 } type_t;
 
 /**
@@ -44,12 +44,12 @@ typedef enum {
  * Valid operations for a binary operation, defined as an enum for convenience.
  */
 typedef enum {
-  PLUS,
-  MINUS,
-  MULT,
-  DIV,
-  R_SHIFT,
-  L_SHIFT,
+    PLUS,
+    MINUS,
+    MULT,
+    DIV,
+    R_SHIFT,
+    L_SHIFT,
 } b_op_t;
 
 /**
@@ -58,20 +58,20 @@ typedef enum {
  * Valid operations for a unary operation, defined as an enum for convenience.
  */
 typedef enum {
-  /// increment operator `++`
-  INC,
+    /// increment operator `++`
+    INC,
 
-  /// decrement operator `--`
-  DEC,
+    /// decrement operator `--`
+    DEC,
 
-  /// not operator `!`
-  NOT,
+    /// not operator `!`
+    NOT,
 
-  /// negation operator `-`
-  NEG,
+    /// negation operator `-`
+    NEG,
 
-  /// no-op, returns the value `+`
-  POS,
+    /// no-op, returns the value `+`
+    POS,
 } u_op_t;
 
 struct ast_node_s;
@@ -82,30 +82,30 @@ struct ast_node_s;
  * A data structure for a mutable variable. The data is an `int`.
  */
 typedef struct {
-  /// The data being stored. It is mutable.
-  int data;
+    /// The data being stored. It is mutable.
+    int data;
 } var_n;
 
 /**
  * \brief Data struct for a constant variable
  */
 typedef struct {
-  /// The data being stored, it is immutable.
-  const int constant;
+    /// The data being stored, it is immutable.
+    const int constant;
 } const_n;
 
 /**
  * \brief Data struct for an if/else construct
  */
 typedef struct {
-  /// the if-else condition
-  struct ast_node_s *cond;
+    /// the if-else condition
+    struct ast_node_s *cond;
 
-  /// the if statement
-  struct ast_node_s *if_stmt;
+    /// the if statement
+    struct ast_node_s *if_stmt;
 
-  /// the else statement
-  struct ast_node_s *else_stmt;
+    /// the else statement
+    struct ast_node_s *else_stmt;
 } if_else_n;
 
 /**
@@ -114,8 +114,8 @@ typedef struct {
  * The root node is effectively a global main function.
  */
 typedef struct {
-  /// main func
-  struct ast_node_s *main_n;
+    /// main func
+    struct ast_node_s *main_n;
 } root;
 
 /**
@@ -125,25 +125,25 @@ typedef struct {
  * fancy things).
  */
 typedef struct {
-  /// the name of the function
-  char *name;
+    /// the name of the function
+    char *name;
 
-  /// the sequence that will be executed
-  struct ast_node_s *fn_seq;
+    /// the sequence that will be executed
+    struct ast_node_s *fn_seq;
 } func_n;
 
 /**
- * \brief Data struct for a binary expression.  
+ * \brief Data struct for a binary expression.
  */
 typedef struct {
-  /// The operation being applied to the binary expression
-  b_op_t op;
+    /// The operation being applied to the binary expression
+    b_op_t op;
 
-  /// The left hand side of the operation
-  struct ast_node_s *lhs;
+    /// The left hand side of the operation
+    struct ast_node_s *lhs;
 
-  /// The right hand side of the operation
-  struct ast_node_s *rhs;
+    /// The right hand side of the operation
+    struct ast_node_s *rhs;
 } bexpr_n;
 
 /**
@@ -159,8 +159,8 @@ typedef struct {
  * declare all of the structs in the union._
  */
 typedef struct {
-  type_t node_type;
-  // TODO: add a union type with data that can take the structs defined above
-  /// The pointers to the child nodes of this node
-  struct ast_node_s *children;
+    type_t node_type;
+    // TODO: add a union type with data that can take the structs defined above
+    /// The pointers to the child nodes of this node
+    struct ast_node_s *children;
 } ast_node_t;

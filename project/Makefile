@@ -13,7 +13,10 @@ LDFLAGS=-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib
 # link the flex libs
 FLEXLD=-L/usr/local/opt/flex/lib
 
-.PHONY: all test docs clean check
+SRC_FILES=$(wildcard src/*.c)
+INC_FILES=$(wildcard include/*.h)
+
+.PHONY: all test docs clean check format
 
 test: $(TEST_DIR)/a.out
 
@@ -30,6 +33,9 @@ check:
 	scan-build make
 
 clean: test_clean
+
+format:
+	clang-format -i $(INC_FILES) $(SRC_FILES)
 
 docs:
 	cd docs; \

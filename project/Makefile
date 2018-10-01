@@ -32,4 +32,5 @@ check:
 clean: test_clean
 
 docs:
+	cd docs; \
 	dox2html5 Doxyfile-mcss

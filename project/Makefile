@@ -38,5 +38,4 @@ format:
 	clang-format -i $(INC_FILES) $(SRC_FILES)
 
 docs:
-	cd docs; \
-		dox2html5 Doxyfile-mcss
+	dox2html5 Doxyfile-mcss

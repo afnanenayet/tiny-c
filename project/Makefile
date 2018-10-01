@@ -39,4 +39,4 @@ format:
 
 docs:
 	cd docs; \
-	dox2html5 Doxyfile-mcss
+		dox2html5 Doxyfile-mcss

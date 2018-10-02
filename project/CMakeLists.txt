@@ -11,11 +11,6 @@ project(minic LANGUAGES C)
 set(program_name minic)
 include(CTest)
 
-# Output to certain folders
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

@@ -7,8 +7,8 @@ endif()
 # enable compile_commands.json for language servers
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(C_STANDARD C11)
-project(TinyCC LANGUAGES C)
-set(program_name tinycc)
+project(minic LANGUAGES C)
+set(program_name minic)
 include(CTest)
 
 # Output to certain folders

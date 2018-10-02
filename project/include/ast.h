@@ -1,4 +1,5 @@
-/* ast.h
+/**
+ * ast.h
  * Afnan Enayet, 2018
  *
  * Defines the interface for interacting with the AST.

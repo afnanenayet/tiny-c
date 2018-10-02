@@ -1,5 +1,5 @@
 /**
- * tinycc.c
+ * minicc.c
  *
  * Main entry point for executable
  */

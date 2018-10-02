@@ -152,13 +152,13 @@ typedef struct {
  * Each AST node has some data field that contains pertinent information
  * relevant for each node type/operation/symbol.
  */
-union node_data {
+typedef union node_data {
     var_n var;
     const_n constant;
     if_else_n if_else;
     func_n func;
     bexpr_n b_expr;
-};
+} node_data_u;
 
 /**
  * \brief The definition for an AST node with a variable number of children.
@@ -177,7 +177,7 @@ typedef struct {
     type_t node_type;
 
     /// Data relevant for the node type, if applicable.
-    union node_data data;
+    node_data_u data;
 
     /// The pointers to the child nodes of this node
     struct ast_node_s *children;

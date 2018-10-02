@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>func_n struct | Small C Compiler A small compiler frontend for a subset of the C language</title>
+  <title>ast_node_s struct | Small C Compiler A small compiler frontend for a subset of the C language</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
   <link rel="stylesheet" href="m-dark+doxygen.compiled.css" />
   <link rel="icon" href="favicon-dark.png" type="image/png" />
@@ -44,9 +44,9 @@
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
         <h1>
-          func_n <span class="m-thin">struct</span>
+          ast_node_s <span class="m-thin">struct</span>
         </h1>
-        <p>Data struct for a function.</p>
+        <p>The definition for an AST node with a variable number of children.</p>
         <div class="m-block m-default">
           <h3>Contents</h3>
           <ul>
@@ -58,14 +58,18 @@
             </li>
           </ul>
         </div>
-<p>A function only holds a name and a sequence (no arguments or other fancy things).</p>
+<p>This defines the type for an AST node. It consists of a type enum so the parser can discern what kind of data will be in the <code>data</code> field. The data field is a union consisting of various structs that contain relevant information for each operation.</p><p><em>Note: be sure to place this definition under all of the node data structs, otherwise it will be significantly more verbose as you will have to forward declare all of the structs in the union.</em></p>
         <section id="pub-attribs">
           <h2><a href="#pub-attribs">Public variables</a></h2>
           <dl class="m-dox">
-            <dt>char* <a href="#ab691b0355621be46757e78d27ccb6d2e" class="m-dox-self" name="ab691b0355621be46757e78d27ccb6d2e">name</a></dt>
-            <dd>the name of the function</dd>
-            <dt>struct <a href="structast__node__s.html" class="m-dox">ast_<wbr />node_<wbr />s</a>* <a href="#abdb178a9b4ac22e64dea640a751d9107" class="m-dox-self" name="abdb178a9b4ac22e64dea640a751d9107">fn_seq</a></dt>
-            <dd>the sequence that will be executed</dd>
+            <dt>type_t <a href="#aca3875194edc66028f1547a5634a825d" class="m-dox-self" name="aca3875194edc66028f1547a5634a825d">n_type</a></dt>
+            <dd>An enum declaring the node type.</dd>
+            <dt><a href="unionnode__data.html" class="m-dox">node_<wbr />data_<wbr />u</a> <a href="#a19d4a3d656cba94b2c604c520f40598e" class="m-dox-self" name="a19d4a3d656cba94b2c604c520f40598e">data</a></dt>
+            <dd>Data relevant for the node type, if applicable.</dd>
+            <dt>struct <a href="structast__node__s.html" class="m-dox">ast_<wbr />node_<wbr />s</a>** <a href="#a32980ec68f47fecc7e026e8f5f096d49" class="m-dox-self" name="a32980ec68f47fecc7e026e8f5f096d49">children</a></dt>
+            <dd>The pointers to the child nodes of this node.</dd>
+            <dt>unsigned int <a href="#a755f43b053c2d40605401341a4a80744" class="m-dox-self" name="a755f43b053c2d40605401341a4a80744">num_children</a></dt>
+            <dd>The number of children this node has.</dd>
           </dl>
         </section>
       </div>

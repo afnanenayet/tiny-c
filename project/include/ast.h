@@ -75,6 +75,7 @@ typedef enum {
     POS,
 } u_op_t;
 
+// Need to forward-declare
 struct ast_node_s;
 
 /**
@@ -92,7 +93,7 @@ typedef struct {
  */
 typedef struct {
     /// The data being stored, it is immutable.
-    const int constant;
+    int constant;
 } const_n;
 
 /**
@@ -108,16 +109,6 @@ typedef struct {
     /// the else statement
     struct ast_node_s *else_stmt;
 } if_else_n;
-
-/**
- * \brief The root node, or global main.
- *
- * The root node is effectively a global main function.
- */
-typedef struct {
-    /// main func
-    struct ast_node_s *main_n;
-} root;
 
 /**
  * \brief Data struct for a function.
@@ -173,13 +164,55 @@ typedef union node_data {
  * otherwise it will be significantly more verbose as you will have to forward
  * declare all of the structs in the union._
  */
-typedef struct {
+typedef struct ast_node_s {
     /// An enum declaring the node type
-    type_t node_type;
+    type_t n_type;
 
     /// Data relevant for the node type, if applicable.
     node_data_u data;
 
     /// The pointers to the child nodes of this node
-    struct ast_node_s *children;
+    struct ast_node_s **children;
+
+    /// The number of children this node has
+    unsigned int num_children;
 } ast_node_t;
+
+/// The global root node of the AST
+extern ast_node_t *ast_root;
+
+// ---------------------------------------------------------------------------
+// Function declarations
+// ---------------------------------------------------------------------------
+
+/** Create/allocate an AST node
+ *
+ * This initializes a node with no children and no type.
+ */
+ast_node_t *create_node();
+
+/** Create/allocate an AST node with the supplied type.
+ *
+ * This initializes a node with the provided type, and no children.
+ */
+ast_node_t *create_node_type(type_t type);
+
+/** Create/allocate an AST node with the supplied type and data struct
+ *
+ * This is a convenience function to initialize a node with a type and some
+ * supplied data.
+ */
+ast_node_t *create_node_type_data(type_t type, node_data_u data);
+
+/** Delete a provided AST node
+ *
+ * Deletes an AST node, given a pointer. This will free the node and its
+ * internal structs.
+ */
+void delete_node(ast_node_t *node);
+
+/** Add a child to a node
+ *
+ * Given a pointer to an AST node, add another node as a child to that node.
+ */
+void add_child(ast_node_t *node, ast_node_t *child);

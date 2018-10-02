@@ -30,7 +30,9 @@ test_clean:
 	rm -f $(TEST_DIR)/*.o $(TEST_DIR)/a.out  # test files
 
 check:
-	scan-build make
+	scan-build cmake --build build -G Ninja
+	ninja -C build clean
+	scan-build ninja -C build
 
 clean: test_clean
 

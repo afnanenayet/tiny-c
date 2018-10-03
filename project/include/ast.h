@@ -45,12 +45,26 @@ typedef enum {
  * Valid operations for a binary operation, defined as an enum for convenience.
  */
 typedef enum {
+    /// addition operator `-`
     PLUS,
+
+    /// substraction operator `-`
     MINUS,
+
+    /// multiplication operator `*`
     MULT,
+
+    /// division operator `/`
     DIV,
-    R_SHIFT,
-    L_SHIFT,
+
+    /// greater than comparative operator `>`
+    GEQ,
+
+    /// less than comparative operator `<`
+    LEQ,
+
+    /// equality comparison operator `==`
+    EQ,
 } b_op_t;
 
 /**
@@ -59,12 +73,6 @@ typedef enum {
  * Valid operations for a unary operation, defined as an enum for convenience.
  */
 typedef enum {
-    /// increment operator `++`
-    INC,
-
-    /// decrement operator `--`
-    DEC,
-
     /// not operator `!`
     NOT,
 
@@ -103,10 +111,10 @@ typedef struct {
     /// the if-else condition
     struct ast_node_s *cond;
 
-    /// the if statement
+    /// the if statement, this should be a sequence node
     struct ast_node_s *if_stmt;
 
-    /// the else statement
+    /// the else statement, this should be a sequence node
     struct ast_node_s *else_stmt;
 } if_else_n;
 
@@ -137,6 +145,17 @@ typedef struct {
     /// The right hand side of the operation
     struct ast_node_s *rhs;
 } bexpr_n;
+
+/**
+ * \brief Data struct for a unary expression.
+ */
+typedef struct {
+    /// The operation being applied to the unary expression
+    u_op_t op;
+
+    /// The expression
+    struct ast_node_s *expr;
+} uexpr_n;
 
 /**
  * \brief A union containing data for each node type.
@@ -178,11 +197,12 @@ typedef struct ast_node_s {
     unsigned int num_children;
 } ast_node_t;
 
-/// The global root node of the AST
+/// The global root node of the AST. This is an empty _no-op_ node. It
+/// represents the `main` function.
 extern ast_node_t *ast_root;
 
 // ---------------------------------------------------------------------------
-// Function declarations
+// Function prototypes
 // ---------------------------------------------------------------------------
 
 /** Retrieve the root node of the AST
@@ -192,7 +212,6 @@ extern ast_node_t *ast_root;
  * can be ignored, as you can just reference `ast_root`.
  */
 ast_node_t *get_root();
-
 
 /** Create/allocate an AST node
  *

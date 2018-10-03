@@ -6,26 +6,22 @@ This directory contains the files for the overall project.
 
 ## Development
 
-This project is built with Makefiles.
+This project is set up with `CMake`. To build this project, do an 
+out-of-source build. I usually use a directory called `build`.
 
-The general standard commands apply.
-
-To build:
+Example:
 
 ```sh
+mkdir -p build;
+cd build;
+cmake ..
 make
 ```
 
-To test:
+You can also run `build.sh`, which will perform the same steps.
 
 ```sh
-make test
-```
-
-To clean build output:
-
-```sh
-make clean
+./build.sh
 ```
 
 ### Documentation
@@ -39,3 +35,9 @@ doxygen Doxyfile
 ```
 
 It will provide warnings for elements that are not documented.
+
+If you want to use the modern theme:
+
+```sh
+dox2html5 Doxyfile-mcss
+```

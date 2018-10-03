@@ -24,4 +24,4 @@ ENDIF(CMAKE_BUILD_TYPE MATCHES Debug)
 file(GLOB sources "${PROJECT_SOURCE_DIR}/src/*.c")
 
 # All source files are listed here. If a source file is added, add it here.
-add_executable(${program_name} ${sources}) 
+add_executable(${program_name} ${sources})

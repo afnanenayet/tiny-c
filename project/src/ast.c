@@ -10,9 +10,24 @@
 
 #include "ast.h"
 
-// Define the global root
-ast_node_t *ast_root = create_node();
+// Define the global root (NULL at default to indicate it hasn't been
+// initialized)
+ast_node_t *ast_root = NULL;
 
+/** Retrieve the root node of the AST
+ *
+ * If it does not already exist then it will be initialized and allocated.
+ * This function returns a pointer to the existing global variable, which
+ * can be ignored, as you can just reference `ast_root`.
+ */
+ast_node_t *get_root() {
+    // If root exists, just return a pointer to the root
+    if (ast_root != NULL)
+        return ast_root;
+
+    ast_root = create_node();
+    return ast_root;
+}
 
 /** Create/allocate an AST node
  *

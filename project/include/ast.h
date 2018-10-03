@@ -185,6 +185,15 @@ extern ast_node_t *ast_root;
 // Function declarations
 // ---------------------------------------------------------------------------
 
+/** Retrieve the root node of the AST
+ *
+ * If it does not already exist then it will be initialized and allocated.
+ * This function returns a pointer to the existing global variable, which
+ * can be ignored, as you can just reference `ast_root`.
+ */
+ast_node_t *get_root();
+
+
 /** Create/allocate an AST node
  *
  * This initializes a node with no children and no type.

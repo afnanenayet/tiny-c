@@ -11,9 +11,9 @@
 
 %union{
     int val; // all values are integers in this subset of C
-    ast_node_t *node;
     char *str;
     char id;
+    ast_node_t *node;
 }
 
 %start program
@@ -31,52 +31,66 @@
 %token E_BRACE
 %token SEMI
 %token MINUS
-%token PLUS
-%token MULT
-%token DIV
-%token GEQ
-%token LEQ
-%token EQ
+%token PLUS_TOK
+%token MULT_TOK
+%token DIV_TOK
+%token GEQ_TOK_TOK
+%token LEQ_TOK_TOK
+%token EQ_TOK
+%token NOT_TOK
 
-%type<val> LITERAL value
-%type<id> VAR
-%type<ast_node_t*> program expression while if_else variable constant if_stmt else_stmt declaration b_exp u_exp
+%type<val> LITERAL
+%type<id> VAR value
+%type<ast_node_t*> program expression while if_else variable constant seq term
+%type<b_op_t> b_op
+%type<u_op_t> u_op
 
 %%
 
 program:
-       expression { }
-       | expression program { }
+       seq { }
+       | seq program { }
+
+seq:
+   expression { }
+   | expression seq { }
 
 expression:
           term b_op term {
-            bexpr_n data = {$2};
+            bexpr_n data = {$2, $1, $3};
             $$ = create_node_type_data(T_BEXP, data);
           }
-          | u_op term { }
+          | u_op term {
+            uexpr_n data = {$1, $2};
+            $$ = create_node_type_data(T_UEXP, data);
+          }
 
 term:
-    INT ASSIGN value {
+    INT ASSIGN value SEMI {
          var_n data = { $3 };
          $$ = create_node_type_data(T_VAR, data);
     }
-    | INT ASSIGN VAR { }
+
+constant:
+        CONST INT LITERAL SEMI {
+            const_n constant = { $3 };
+            $$ = create_node_type_data(type_t T_CONST, constant);
+        }
 
 value:
      LITERAL { $$ = $1; }
-     VAR { $$ = $1 }
 
 b_op:
-    MULT { $$ = b_op_t MULT; }
-    | DIV { $$ = b_op_t DIV; }
+    MULT_TOK { $$ = b_op_t MULT_TOK; }
+    | DIV_TOK { $$ = b_op_t DIV_TOK; }
     | MINUS { $$ = b_op_t MINUS; }
-    | PLUS { $$ = b_op_t PLUS; }
-    | EQ { $$ = b_op_t EQ; }
-    | GEQ { $$ = b_op_t GEQ; }
-    | LEQ { $$ = b_op_t LEQ; }
+    | PLUS_TOK { $$ = b_op_t PLUS_TOK; }
+    | EQ_TOK { $$ = b_op_t EQ_TOK; }
+    | GEQ_TOK_TOK { $$ = b_op_t GEQ_TOK_TOK; }
+    | LEQ_TOK_TOK { $$ = b_op_t LEQ_TOK_TOK; }
 
 u_op:
     MINUS { $$ = u_op_t NEG; }
-    NOT { $$ = u_op_t NOT; }
+    | NOT_TOK { $$ = u_op_t NOT; }
 
 %%

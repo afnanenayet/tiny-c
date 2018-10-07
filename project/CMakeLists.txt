@@ -22,10 +22,17 @@ find_package(BISON 3.1 REQUIRED)
 find_package(FLEX 2.6 REQUIRED)
 
 # generate bison output
-BISON_TARGET(MiniCParser ${PROJECT_SOURCE_DIR}/src/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.c)
+BISON_TARGET(MiniCParser 
+    ${PROJECT_SOURCE_DIR}/src/parser.y 
+    ${CMAKE_CURRENT_BINARY_DIR}/parser.c
+    COMPILE_FLAGS "-t"
+    )
 
 # generate flex output
-FLEX_TARGET(MiniCScanner ${PROJECT_SOURCE_DIR}/src/lexer.l ${CMAKE_CURRENT_BINARY_DIR}/scanner.c)
+FLEX_TARGET(MiniCScanner 
+    ${PROJECT_SOURCE_DIR}/src/lexer.l 
+    ${CMAKE_CURRENT_BINARY_DIR}/scanner.c
+    )
 
 ADD_FLEX_BISON_DEPENDENCY(MiniCScanner MiniCParser)
 

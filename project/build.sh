@@ -3,7 +3,12 @@
 #
 # Creates a build directory and runs CMake
 
+echo "Creating build directory...";
 mkdir -p build;
 cd build;
-cmake ..;
+
+echo "Generating Makefiles using CMake...";
+cmake .. -DCMAKE_BUILD_TYPE=Release;
+
+echo "Building project...";
 make;

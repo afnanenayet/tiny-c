@@ -38,6 +38,9 @@ typedef enum {
 
     /// sequence
     T_SEQ,
+
+    /// root node
+    T_MAIN,
 } type_t;
 
 /**
@@ -126,6 +129,17 @@ typedef struct {
 } if_else_n;
 
 /**
+ * \brief Data struct for a while construct
+ */
+typedef struct {
+    /// The condition to perpetuate the loop
+    struct ast_node_s *cond;
+
+    /// The sequence of actions to take in the body of the loop
+    struct ast_node_s *body;
+} while_n;
+
+/**
  * \brief Data struct for a function.
  *
  * A function only holds a name and a sequence (no arguments or other
@@ -192,6 +206,7 @@ typedef union node_data {
     const_n constant;
     decl_n declaration;
     if_else_n if_else;
+    while_n while_loop;
     func_n func;
     bexpr_n b_expr;
     uexpr_n u_expr;

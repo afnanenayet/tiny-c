@@ -5,11 +5,13 @@
  * Grammar definition for the subset of C specified in the assignment
  */
 
+#include <stdio.h>
 #include <stdbool.h>
 
 #include "ast.h"
 
 extern int yylex();
+void yyerror(char *str);
 %}
 
 %union{
@@ -29,7 +31,7 @@ extern int yylex();
 %token WHILE
 %token IF
 %token ELSE
-%token ELIF
+%token ENDIF
 %token ASSIGN
 %token S_BRACE
 %token E_BRACE
@@ -44,20 +46,26 @@ extern int yylex();
 %token LEQ_TOK_TOK
 %token EQ_TOK
 %token NOT_TOK
-%token EOF
+%token EOF_TOK
+%token NO_ELSE
+%token RET
+%token MAIN_ID
 
 %type<val> LITERAL
 %type<id> VAR
-%type<node> program expression while if_else seq term declaration assignment code_block statement
-%type<node> if_stmt else_stmt
+%type<node> program expression while if_else seq term declaration assignment
+%type<node> if_stmt else_stmt code_block statement main_func
 %type<binary_op> b_op
 %type<unary_op> u_op
+
+%nonassoc ENDIF
+%nonassoc ELSE
 
 %%
 
 program:
-       seq {
-            ast_node_t *ast_root = get_root();
+       main_func {
+            ast_node_t *ast_root = create_node_type(T_MAIN);
             add_child(ast_root, $1);
        }
 
@@ -66,25 +74,24 @@ code_block:
               $$ = $2;
           }
 
+main_func:
+         INT MAIN_ID S_PAREN E_PAREN code_block RET LITERAL SEMI {
+            $$ = $5;
+         }
+
 seq:
    statement SEMI {
-       // `data` is intentionally not initialized, as it is not used.
-       // sequences only have children, and we don't need to store any data
-       // with them
-       node_data_u data;
        ast_node_t *expr = $1;
-       ast_node_t *seq = create_node_type_data(T_SEQ, data);
+       ast_node_t *seq = create_node_type(T_SEQ);
        add_child(seq, expr);
        $$ = seq;
    }
    | seq statement SEMI {
-       node_data_u data;
        ast_node_t *seq = $1;
        ast_node_t *expr = $2;
        add_child(seq, expr);
        $$ = seq;
    }
-   ;
 
 expression:
           term b_op term {
@@ -97,7 +104,6 @@ expression:
             data.u_expr = (uexpr_n) {$1, $2};
             $$ = create_node_type_data(T_UEXP, data);
           }
-          ;
 
 statement:
          assignment SEMI { $$ = $1; }
@@ -107,7 +113,6 @@ statement:
 
 assignment:
           VAR ASSIGN LITERAL {
-              ast_node_t *node;
               node_data_u data;
               data.var = (var_n) { $1, $3 };
               $$ = create_node_type_data(T_VAR, data);
@@ -119,24 +124,53 @@ assignment:
               add_child(node, $3);
               $$ = node;
           }
-          ;
 
 while:
         WHILE S_PAREN expression E_PAREN code_block {
+            ast_node_t *condition = $3;
+            ast_node_t *body = $5;
+            node_data_u data;
+            data.while_loop = (while_n) { condition, body };
+            $$ = create_node_type_data(T_WHILE, data);
         }
         | WHILE S_PAREN expression E_PAREN statement {
+            ast_node_t *condition = $3;
+            ast_node_t *body = $5;
+            node_data_u data;
+            data.while_loop = (while_n) { condition, body };
+            $$ = create_node_type_data(T_WHILE, data);
         }
-     ;
 
 
 if_else:
-       ;
+       if_stmt %prec ENDIF {
+           $$ = $1;
+       }
+       | if_stmt else_stmt {
+           ast_node_t *node = $1;
+           node->data.if_else.else_stmt = $2;
+           $$ = node;
+       }
 
 if_stmt:
-       ;
+       IF S_PAREN expression E_PAREN code_block {
+           node_data_u data;
+           data.if_else = (if_else_n) { $3, $5, NULL };
+           $$ = create_node_type_data(T_IF, data);
+       }
+       | IF S_PAREN expression E_PAREN statement {
+           node_data_u data;
+           data.if_else = (if_else_n) { $3, $5, NULL };
+           $$ = create_node_type_data(T_IF, data);
+       }
 
 else_stmt:
-         ;
+         ELSE statement {
+            $$ = $2;
+         }
+         | ELSE code_block {
+            $$ = $2;
+         }
 
 declaration:
            INT VAR SEMI {
@@ -149,7 +183,6 @@ declaration:
                data.declaration = (decl_n) { $3, true };
                $$ = create_node_type_data(T_DECL, data);
            }
-           ;
 
 term:
     VAR {
@@ -172,3 +205,11 @@ u_op:
     | NOT_TOK { $$ = NOT; }
 
 %%
+
+void yyerror(char *str) {
+    printf("Error: unable to parse string \"%s\"\n", str);
+}
+
+int main() {
+    yyparse();
+}

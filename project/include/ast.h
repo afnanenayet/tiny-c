@@ -169,6 +169,7 @@ typedef union node_data {
     if_else_n if_else;
     func_n func;
     bexpr_n b_expr;
+    uexpr_n u_expr;
 } node_data_u;
 
 /**

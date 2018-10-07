@@ -56,7 +56,12 @@ program: seq {
             add_child(ast_root, $1);
          }
 
-seq: expression SEMI { }
+seq: 
+   expression SEMI {
+       node_data_u data;
+       data.
+       $$ = create_node_type_data(T_EXP, data);     
+   }
    | seq expression SEMI { }
    ;
 

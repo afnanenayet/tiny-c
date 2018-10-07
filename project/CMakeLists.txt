@@ -7,11 +7,6 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-# echo prefix paths for verification
-# foreach(path ${CMAKE_PREFIX_PATH})
-#   message("prefix path: " ${path})
-# endforeach(path)
-
 # enable compile_commands for language servers
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(C_STANDARD C11)
@@ -23,20 +18,14 @@ include(CTest)
 set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -Wpedantic -std=c11")
 
 # look for bison and flex libraries
-find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
+find_package(BISON 3.1 REQUIRED)
+find_package(FLEX 2.6 REQUIRED)
 
 # generate bison output
-BISON_TARGET(MiniCParser
-    ${PROJECT_SOURCE_DIR}/src/parser.y
-    ${CMAKE_CURRENT_BINARY_DIR}/parser.c
-    )
+BISON_TARGET(MiniCParser ${PROJECT_SOURCE_DIR}/src/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.c)
 
 # generate flex output
-FLEX_TARGET(MiniCScanner
-    ${PROJECT_SOURCE_DIR}/src/lexer.l
-    ${CMAKE_CURRENT_BINARY_DIR}/lexer.c
-    )
+FLEX_TARGET(MiniCScanner ${PROJECT_SOURCE_DIR}/src/lexer.l ${CMAKE_CURRENT_BINARY_DIR}/scanner.c)
 
 ADD_FLEX_BISON_DEPENDENCY(MiniCScanner MiniCParser)
 
@@ -53,10 +42,8 @@ include_directories(
 
 # All source files are listed here. If a source file is added, add it here.
 add_executable(${program_name}
-    ${BISON_MiniCParser_OUTPUTS}
-    ${FLEX_MiniCParser_OUTPUTS}
     ${PROJECT_SOURCE_DIR}/src/ast.c
     ${PROJECT_SOURCE_DIR}/src/minic.c
+    ${BISON_MiniCParser_OUTPUTS}
+    ${FLEX_MiniCScanner_OUTPUTS}
     )
-
-TARGET_LINK_LIBRARIES(${program_name} ${FLEX_LIBRARIES})

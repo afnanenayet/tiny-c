@@ -86,3 +86,10 @@ void add_child(ast_node_t *node, ast_node_t *child) {
     *(array + node->num_children) = child;
     node->num_children++;
 }
+
+/**
+ * \brief Walk through a tree and recreate the program based on the tree
+ */
+void recreate_program(ast_node_t *tree) {
+
+}

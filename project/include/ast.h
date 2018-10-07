@@ -5,9 +5,8 @@
  * Defines the interface for interacting with the AST.
  */
 
-#pragma once
-
 #include <stdbool.h>
+#pragma once
 
 /**
  * \brief A enum that stores the possible types for each AST node.

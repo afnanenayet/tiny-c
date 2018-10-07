@@ -68,31 +68,34 @@ void yyerror(const char *str);
 
 program:
        main_func {
-            ast_node_t *ast_root = create_node_type(T_MAIN);
             add_child(ast_root, $1);
        }
 
 code_block:
           S_BRACE seq E_BRACE {
-              $$ = $2;
+              $<node>$ = $2;
+          }
+          | S_BRACE E_BRACE {
+            // empty code blocks are legal
+            $<node>$ = NULL;
           }
 
 main_func:
-         INT MAIN_ID S_PAREN E_PAREN code_block RET LITERAL SEMI {
+         INT MAIN_ID S_PAREN E_PAREN code_block {
             $$ = $5;
          }
 
 seq:
-   statement SEMI {
+   statement {
        ast_node_t *expr = $1;
        ast_node_t *seq = create_node_type(T_SEQ);
        add_child(seq, expr);
        $$ = seq;
    }
-   | seq statement SEMI {
+   | seq statement {
        ast_node_t *seq = $1;
-       ast_node_t *expr = $2;
-       add_child(seq, expr);
+       ast_node_t *stmt = $2;
+       add_child(seq, stmt);
        $$ = seq;
    }
 
@@ -176,12 +179,12 @@ else_stmt:
          }
 
 declaration:
-           INT VAR SEMI {
+           INT VAR {
                node_data_u data;
                data.declaration = (decl_n) { $2, false };
                $$ = create_node_type_data(T_DECL, data);
            }
-           | CONST INT VAR SEMI {
+           | CONST INT VAR {
                node_data_u data;
                data.declaration = (decl_n) { $3, true };
                $$ = create_node_type_data(T_DECL, data);

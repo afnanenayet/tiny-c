@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Project | Small C Compiler A small compiler frontend for a subset of the C language</title>
+  <title>decl_n struct | Small C Compiler A small compiler frontend for a subset of the C language</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
   <link rel="stylesheet" href="m-dark+doxygen.compiled.css" />
   <link rel="icon" href="favicon-dark.png" type="image/png" />
@@ -44,12 +44,39 @@
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
         <h1>
-          Project
+          decl_n <span class="m-thin">struct</span>
         </h1>
-<h3>Summary</h3><p>This directory contains the files for the overall project.</p><h3>Development</h3><p>This project is set up with <code>CMake</code>. To build this project, do an out-of-source build. I usually use a directory called <code>build</code>.</p><p>Example:</p><pre class="m-code">mkdir -p build<span class="p">;</span>
-<span class="nb">cd</span> build<span class="p">;</span>
-cmake ..
-make</pre><p>You can also run <code>build.sh</code>, which will perform the same steps.</p><pre class="m-code">./build.sh</pre><h4>Documentation</h4><p>Developer documentation is generated through <code>Doxygen</code>.</p><p>To generate the docs:</p><pre class="m-code">doxygen Doxyfile</pre><p>It will provide warnings for elements that are not documented.</p><p>If you want to use the modern theme:</p><pre class="m-code">dox2html5 Doxyfile-mcss</pre>
+        <p>Data struct for a variable/constant declaration.</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#pub-attribs">Public variables</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+<p>The data structure for a declaration. It does not contain a value, but only the information for a variable being declared. In this particular subset of C, a variable cannot be initialized and defined at the same time.</p>
+        <section id="pub-attribs">
+          <h2><a href="#pub-attribs">Public variables</a></h2>
+          <dl class="m-dox">
+            <dt>char* <a href="#afa2e16fa5a1d1919dcdad4051d50f230" class="m-dox-self" name="afa2e16fa5a1d1919dcdad4051d50f230">id</a></dt>
+            <dd>The variable/constant name of the variable or constant being declared.</dd>
+            <dt>bool <a href="#ac09903380150bc63f3930e339e4e4376" class="m-dox">constant</a></dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Variable documentation</h2>
+          <section class="m-dox-details" id="ac09903380150bc63f3930e339e4e4376"><div>
+            <h3>
+              bool decl_<wbr />n::<wbr /><a href="#ac09903380150bc63f3930e339e4e4376" class="m-dox-self">constant</a>
+            </h3>
+<p>Whether the declared variable is a constant value. In this case, the variable can only be assigned a value once, and this value cannot change.</p>
+          </div></section>
+        </section>
       </div>
     </div>
   </div>

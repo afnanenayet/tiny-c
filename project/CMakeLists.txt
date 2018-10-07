@@ -8,21 +8,21 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 # echo prefix paths for verification
-foreach(path ${CMAKE_PREFIX_PATH})
-  message("Path: " ${path})
-endforeach(path)
+# foreach(path ${CMAKE_PREFIX_PATH})
+#   message("prefix path: " ${path})
+# endforeach(path)
 
-# enable compile_commands.json for language servers
+# enable compile_commands for language servers
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(C_STANDARD C11)
 project(minic LANGUAGES C)
 set(program_name minic)
 include(CTest)
 
-# set all warnings
+# enable all warnings
 set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -Wpedantic -std=c11")
 
-# look for bison and flex libs
+# look for bison and flex libraries
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
@@ -30,11 +30,14 @@ find_package(FLEX REQUIRED)
 BISON_TARGET(MiniCParser
     ${PROJECT_SOURCE_DIR}/src/parser.y
     ${CMAKE_CURRENT_BINARY_DIR}/parser.c
-    COMPILE_FLAGS "-d"
     )
 
 # generate flex output
-FLEX_TARGET(MiniCScanner ${PROJECT_SOURCE_DIR}/src/lexer.l  ${CMAKE_CURRENT_BINARY_DIR}/lexer.c)
+FLEX_TARGET(MiniCScanner
+    ${PROJECT_SOURCE_DIR}/src/lexer.l
+    ${CMAKE_CURRENT_BINARY_DIR}/lexer.c
+    )
+
 ADD_FLEX_BISON_DEPENDENCY(MiniCScanner MiniCParser)
 
 # only enable testing on debug builds

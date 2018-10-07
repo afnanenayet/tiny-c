@@ -10,8 +10,11 @@
 
 #include "ast.h"
 
+// Declare stuff from Flex that Bison needs to know about:
 extern int yylex();
-void yyerror(char *str);
+extern int yyparse();
+void yyerror(const char *str);
+
 %}
 
 %union{
@@ -42,8 +45,8 @@ void yyerror(char *str);
 %token PLUS_TOK
 %token MULT_TOK
 %token DIV_TOK
-%token GEQ_TOK_TOK
-%token LEQ_TOK_TOK
+%token GEQ_TOK
+%token LEQ_TOK
 %token EQ_TOK
 %token NOT_TOK
 %token EOF_TOK
@@ -197,8 +200,8 @@ b_op:
     | MINUS_TOK { $$ = MINUS; }
     | PLUS_TOK { $$ = PLUS; }
     | EQ_TOK { $$ = EQ; }
-    | GEQ_TOK_TOK { $$ = GEQ; }
-    | LEQ_TOK_TOK { $$ = LEQ; }
+    | GEQ_TOK { $$ = GEQ; }
+    | LEQ_TOK { $$ = LEQ; }
 
 u_op:
     MINUS_TOK { $$ = NEG; }
@@ -206,10 +209,6 @@ u_op:
 
 %%
 
-void yyerror(char *str) {
+void yyerror(const char *str) {
     printf("Error: unable to parse string \"%s\"\n", str);
-}
-
-int main() {
-    yyparse();
 }

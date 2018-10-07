@@ -53,9 +53,10 @@ include_directories(
 
 # All source files are listed here. If a source file is added, add it here.
 add_executable(${program_name}
-    ${PROJECT_SOURCE_DIR}/src/minic.c
-    ${PROJECT_SOURCE_DIR}/src/ast.c
+    ${BISON_MiniCParser_OUTPUTS}
     ${FLEX_MiniCParser_OUTPUTS}
+    ${PROJECT_SOURCE_DIR}/src/ast.c
+    ${PROJECT_SOURCE_DIR}/src/minic.c
     )
 
 TARGET_LINK_LIBRARIES(${program_name} ${FLEX_LIBRARIES})

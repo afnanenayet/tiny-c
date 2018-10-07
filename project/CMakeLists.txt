@@ -20,7 +20,7 @@ set(program_name minic)
 include(CTest)
 
 # set all warnings
-set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -Wpedantic")
+set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -Wpedantic -std=c11")
 
 # look for bison and flex libs
 find_package(BISON REQUIRED)

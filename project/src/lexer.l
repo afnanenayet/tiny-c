@@ -1,8 +1,13 @@
 %{
+    #include "ast.h"
     #include "parser.h"
+
     extern int yylex();
 %}
+
 %option noyywrap
+%option nounput
+%option noinput
 
 %%
 
@@ -28,6 +33,7 @@
 "!" { return NOT_TOK; }
 "main" { return MAIN_ID; }
 \n ;
+[ \t]+ ;
 [0-9]+ { yylval.val = atoi(yytext); return LITERAL; }
 [a-zA-Z0-9_]+ { yylval.id = strdup(yytext); return VAR; }
 

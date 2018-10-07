@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include <stdbool.h>
 
 /**
  * \brief A enum that stores the possible types for each AST node.
@@ -92,6 +93,9 @@ struct ast_node_s;
  * A data structure for a mutable variable. The data is an `int`.
  */
 typedef struct {
+    /// The identifier for the variable, it is a string.
+    char *id;
+
     /// The data being stored. It is mutable.
     int data;
 } var_n;
@@ -100,6 +104,9 @@ typedef struct {
  * \brief Data struct for a constant variable
  */
 typedef struct {
+    /// The identifier for the constant, it is a string.
+    char *id;
+
     /// The data being stored, it is immutable.
     int constant;
 } const_n;
@@ -131,6 +138,23 @@ typedef struct {
     /// the sequence that will be executed
     struct ast_node_s *fn_seq;
 } func_n;
+
+/**
+ * \brief Data struct for a variable/constant declaration.
+ *
+ * The data structure for a declaration. It does not contain a value, but only
+ * the information for a variable being declared. In this particular subset of
+ * C, a variable cannot be initialized and defined at the same time.
+ */
+typedef struct {
+    /// The variable/constant name of the variable or constant being declared
+    char *id;
+
+    /// Whether the declared variable is a constant value. In this case, the
+    /// variable can only be assigned a value once, and this value cannot
+    /// change.
+    bool constant;
+} decl_n;
 
 /**
  * \brief Data struct for a binary expression.
@@ -166,6 +190,7 @@ typedef struct {
 typedef union node_data {
     var_n var;
     const_n constant;
+    decl_n declaration;
     if_else_n if_else;
     func_n func;
     bexpr_n b_expr;

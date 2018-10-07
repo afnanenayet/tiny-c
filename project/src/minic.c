@@ -12,5 +12,6 @@ int main(void) {
     // arbitrary number of children (NOT a btree)
     // bison has the actions that make the tree
     // never have to explicitly call yylex
+    yyparse();
     return 0;
 }

@@ -5,6 +5,8 @@
  * Grammar definition for the subset of C specified in the assignment
  */
 
+#include <stdbool.h>
+
 #include "ast.h"
 
 extern int yylex();
@@ -12,8 +14,7 @@ extern int yylex();
 
 %union{
     int val; // all values are integers in this subset of C
-    char *str;
-    char id;
+    char *id;
     ast_node_t *node;
     b_op_t binary_op;
     u_op_t unary_op;
@@ -32,6 +33,8 @@ extern int yylex();
 %token ASSIGN
 %token S_BRACE
 %token E_BRACE
+%token S_PAREN
+%token E_PAREN
 %token SEMI
 %token MINUS_TOK
 %token PLUS_TOK
@@ -44,25 +47,43 @@ extern int yylex();
 %token EOF
 
 %type<val> LITERAL
-%type<id> VAR value
-%type<node> program expression while if_else variable constant seq term
+%type<id> VAR
+%type<node> program expression while if_else seq term declaration assignment code_block statement
+%type<node> if_stmt else_stmt
 %type<binary_op> b_op
 %type<unary_op> u_op
 
 %%
 
-program: seq {
+program:
+       seq {
             ast_node_t *ast_root = get_root();
             add_child(ast_root, $1);
-         }
+       }
 
-seq: 
-   expression SEMI {
+code_block:
+          S_BRACE seq E_BRACE {
+              $$ = $2;
+          }
+
+seq:
+   statement SEMI {
+       // `data` is intentionally not initialized, as it is not used.
+       // sequences only have children, and we don't need to store any data
+       // with them
        node_data_u data;
-       data.
-       $$ = create_node_type_data(T_EXP, data);     
+       ast_node_t *expr = $1;
+       ast_node_t *seq = create_node_type_data(T_SEQ, data);
+       add_child(seq, expr);
+       $$ = seq;
    }
-   | seq expression SEMI { }
+   | seq statement SEMI {
+       node_data_u data;
+       ast_node_t *seq = $1;
+       ast_node_t *expr = $2;
+       add_child(seq, expr);
+       $$ = seq;
+   }
    ;
 
 expression:
@@ -79,40 +100,63 @@ expression:
           ;
 
 statement:
-         assignment SEMI { }
-         | while SEMI { }
-         | if_else SEMI { }
-         | declaration SEMI { }
+         assignment SEMI { $$ = $1; }
+         | while { $$ = $1; }
+         | if_else { $$ = $1; }
+         | declaration SEMI { $$ = $1; }
 
 assignment:
+          VAR ASSIGN LITERAL {
+              ast_node_t *node;
+              node_data_u data;
+              data.var = (var_n) { $1, $3 };
+              $$ = create_node_type_data(T_VAR, data);
+          }
+          | VAR ASSIGN term {
+              node_data_u data;
+              data.var = (var_n) {$1, 0};
+              ast_node_t *node = create_node_type_data(T_VAR, data);
+              add_child(node, $3);
+              $$ = node;
+          }
           ;
 
 while:
+        WHILE S_PAREN expression E_PAREN code_block {
+        }
+        | WHILE S_PAREN expression E_PAREN statement {
+        }
      ;
+
 
 if_else:
        ;
 
+if_stmt:
+       ;
+
+else_stmt:
+         ;
+
 declaration:
+           INT VAR SEMI {
+               node_data_u data;
+               data.declaration = (decl_n) { $2, false };
+               $$ = create_node_type_data(T_DECL, data);
+           }
+           | CONST INT VAR SEMI {
+               node_data_u data;
+               data.declaration = (decl_n) { $3, true };
+               $$ = create_node_type_data(T_DECL, data);
+           }
            ;
 
 term:
-    INT ASSIGN value SEMI {
-        // TODO define term properly
+    VAR {
          node_data_u data;
-         data.var = (var_n) { $3 };
+         data.var = (var_n) { $1, 0 };
          $$ = create_node_type_data(T_VAR, data);
     }
-
-constant:
-        CONST INT value SEMI {
-            node_data_u data;
-            data.constant = (const_n) { $3 };
-            $$ = create_node_type_data(type_t T_CONST, constant);
-        }
-
-value:
-     LITERAL { $$ = $1; }
 
 b_op:
     MULT_TOK { $$ = MULT; }

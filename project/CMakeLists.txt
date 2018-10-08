@@ -22,6 +22,15 @@ set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -Wpedantic -std=c11")
 find_package(BISON 3.1 REQUIRED)
 find_package(FLEX 2.6 REQUIRED)
 
+# optional doxygen package to generate docs
+find_package(Doxygen)
+
+doxygen_add_docs(
+    doxygen
+    ${PROJECT_SOURCE_DIR}
+    COMMENT "Generate documentation"
+    )
+
 # generate bison output
 BISON_TARGET(MiniCParser 
     ${PROJECT_SOURCE_DIR}/src/parser.y 

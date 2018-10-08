@@ -36,12 +36,6 @@ FLEX_TARGET(MiniCScanner
 
 ADD_FLEX_BISON_DEPENDENCY(MiniCScanner MiniCParser)
 
-# only enable testing on debug builds
-IF(CMAKE_BUILD_TYPE MATCHES Debug)
-    enable_testing()
-    add_subdirectory(${PROJECT_SOURCE_DIR}/test)
-ENDIF(CMAKE_BUILD_TYPE MATCHES Debug)
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}

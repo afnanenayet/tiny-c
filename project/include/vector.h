@@ -1,5 +1,6 @@
 /**
  * \file vector.h
+ * \author Afnan Enayet
  *
  * Defines the interface for a vector
  */

@@ -1,5 +1,6 @@
 /**
- * minicc.c
+ * \file minicc.c
+ * \author Afnan Enayet
  *
  * Main entry point for executable
  */
@@ -24,6 +25,5 @@ int main(void) {
     // create ast root
     ast_root = create_node_type(T_MAIN);
     yyparse();
-    printf("%d children\n", ast_root->num_children);
     return 0;
 }

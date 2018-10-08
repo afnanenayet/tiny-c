@@ -1,6 +1,6 @@
 /**
- * ast.h
- * Afnan Enayet, 2018
+ * \file ast.h
+ * \author Afnan Enayet
  *
  * Defines the interface for interacting with the AST.
  */
@@ -309,3 +309,15 @@ ast_node_t *create_node_type_data(type_t type, node_data_u data);
  * \param[out] node A pointer to a node which will be free'd.
  */
 void delete_node(ast_node_t *node);
+
+
+/**
+ * \brief Convenience function to create a sequence AST node
+ *
+ * Creates the proper structure, allocates the vector, and allocates
+ * a node.
+ *
+ * \return A new node of type `T_SEQ` and an allocated vector
+ *     for the node's children
+ */
+ast_node_t *create_node_seq();

@@ -1,5 +1,6 @@
 /**
- * ast.c
+ * \file ast.c
+ * \author Afnan Enayet
  *
  * Function implementations to build and construct an abstract syntax tree.
  * These functions can be invoked via bison.

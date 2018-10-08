@@ -84,13 +84,13 @@ void delete_node(ast_node_t *node) {
  *     for the node's children
  */
 ast_node_t *create_node_seq() {
-    ast_node_t *node = create_node_type(T_SEQ);
     node_data_u data;
     data.sequence = (seq_n){vector_new()};
+    ast_node_t *node = create_node_type_data(T_SEQ, data);
     return node;
 }
 
 /**
  * \brief Walk through a tree and recreate the program based on the tree
  */
-void recreate_program(ast_node_t *tree) {}
+void recreate_program(ast_node_t *tree) {/* TODO */}

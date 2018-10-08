@@ -41,3 +41,8 @@ If you want to use the modern theme:
 ```sh
 dox2html5 Doxyfile-mcss
 ```
+
+The CMake file also contains information so Doxygen documentation can be
+generated through the Cmake build system. It will create a target called
+`docs` that will invoke doxygen and output documentation in the build
+folder.

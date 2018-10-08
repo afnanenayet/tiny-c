@@ -9,6 +9,7 @@
 #include <stdbool.h>
 
 #include "ast.h"
+#include "vector.h"
 
 // Declare stuff from Flex that Bison needs to know about:
 extern int yylex();
@@ -68,16 +69,17 @@ void yyerror(const char *str);
 
 program:
        main_func {
-            add_child(ast_root, $1);
+            vector_t *vec = ast_root->data.sequence.children;
+            vector_add(vec, $1);
        }
 
 code_block:
           S_BRACE seq E_BRACE {
-              $<node>$ = $2;
+              $$ = $2;
           }
           | S_BRACE E_BRACE {
             // empty code blocks are legal
-            $<node>$ = NULL;
+            $$ = NULL;
           }
 
 main_func:
@@ -88,14 +90,18 @@ main_func:
 seq:
    statement {
        ast_node_t *expr = $1;
-       ast_node_t *seq = create_node_type(T_SEQ);
-       add_child(seq, expr);
+       ast_node_t *seq = create_node_seq();
+
+       vector_t *vec = seq->data.sequence.children;
+       vector_add(vec, expr);
        $$ = seq;
    }
    | seq statement {
        ast_node_t *seq = $1;
        ast_node_t *stmt = $2;
-       add_child(seq, stmt);
+
+       vector_t *vec = seq->data.sequence.children;
+       vector_add(vec, stmt);
        $$ = seq;
    }
 
@@ -119,15 +125,19 @@ statement:
 
 assignment:
           VAR ASSIGN LITERAL {
+              // create the literal value node
+              node_data_u lval_data;
+              lval_data.literal = (lval_n) { $3 };
+              ast_node_t *literal = create_node_type_data(T_LVAL, lval_data);
+
               node_data_u data;
-              data.var = (var_n) { $1, $3 };
+              data.var = (var_n) { $1, literal };
               $$ = create_node_type_data(T_VAR, data);
           }
           | VAR ASSIGN term {
               node_data_u data;
-              data.var = (var_n) {$1, 0};
+              data.var = (var_n) {$1, $3};
               ast_node_t *node = create_node_type_data(T_VAR, data);
-              add_child(node, $3);
               $$ = node;
           }
 

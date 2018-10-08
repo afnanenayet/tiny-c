@@ -23,7 +23,7 @@ bool semantic_check(ast_node_t *tree) { return false; }
 
 int main(void) {
     // create ast root
-    ast_root = create_node_type(T_MAIN);
+    ast_root = create_node_seq();
     yyparse();
     return 0;
 }

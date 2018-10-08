@@ -55,6 +55,7 @@ include_directories(
 add_executable(${program_name}
     ${PROJECT_SOURCE_DIR}/src/ast.c
     ${PROJECT_SOURCE_DIR}/src/minic.c
+    ${PROJECT_SOURCE_DIR}/src/vector.c
     ${BISON_MiniCParser_OUTPUTS}
     ${FLEX_MiniCScanner_OUTPUTS}
     )

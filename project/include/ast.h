@@ -42,8 +42,8 @@ typedef enum {
     /// sequence
     T_SEQ,
 
-    /// root node
-    T_MAIN,
+    /// a literal value
+    T_LVAL,
 } type_t;
 
 /**
@@ -115,7 +115,7 @@ typedef struct {
     char *id;
 
     /// The data being stored. It is mutable.
-    int data;
+    struct ast_node_s *value;
 } var_n;
 
 /**
@@ -126,8 +126,18 @@ typedef struct {
     char *id;
 
     /// The data being stored, it is immutable.
-    int constant;
+    struct ast_node_s *value;
 } const_n;
+
+/**
+ * \brief Data struct for a literal value
+ *
+ * This struct is generally meant to be used with const and var structs.
+ */
+typedef struct {
+    /// The literal value
+    int lval;
+} lval_n;
 
 /**
  * \brief Data struct for an if/else construct
@@ -217,6 +227,7 @@ typedef struct {
  * relevant for each node type/operation/symbol.
  */
 typedef union node_data {
+    lval_n literal;
     seq_n sequence;
     var_n var;
     const_n constant;
@@ -309,7 +320,6 @@ ast_node_t *create_node_type_data(type_t type, node_data_u data);
  * \param[out] node A pointer to a node which will be free'd.
  */
 void delete_node(ast_node_t *node);
-
 
 /**
  * \brief Convenience function to create a sequence AST node

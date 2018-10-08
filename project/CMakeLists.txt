@@ -32,15 +32,14 @@ doxygen_add_docs(
     )
 
 # generate bison output
-BISON_TARGET(MiniCParser 
-    ${PROJECT_SOURCE_DIR}/src/parser.y 
+BISON_TARGET(MiniCParser
+    ${PROJECT_SOURCE_DIR}/src/parser.y
     ${CMAKE_CURRENT_BINARY_DIR}/parser.c
-    COMPILE_FLAGS "-t"
     )
 
 # generate flex output
-FLEX_TARGET(MiniCScanner 
-    ${PROJECT_SOURCE_DIR}/src/lexer.l 
+FLEX_TARGET(MiniCScanner
+    ${PROJECT_SOURCE_DIR}/src/lexer.l
     ${CMAKE_CURRENT_BINARY_DIR}/scanner.c
     )
 
@@ -58,4 +57,11 @@ add_executable(${program_name}
     ${PROJECT_SOURCE_DIR}/src/vector.c
     ${BISON_MiniCParser_OUTPUTS}
     ${FLEX_MiniCScanner_OUTPUTS}
+    )
+
+# creating a library for the unit tests
+add_library(minic_lib
+    ${PROJECT_SOURCE_DIR}/src/ast.c
+    ${PROJECT_SOURCE_DIR}/src/minic.c
+    ${PROJECT_SOURCE_DIR}/src/vector.c
     )

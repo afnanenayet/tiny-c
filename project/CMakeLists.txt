@@ -26,7 +26,7 @@ find_package(FLEX 2.6 REQUIRED)
 find_package(Doxygen)
 
 doxygen_add_docs(
-    doxygen
+    docs
     ${PROJECT_SOURCE_DIR}
     COMMENT "Generate documentation"
     )

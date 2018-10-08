@@ -6,6 +6,9 @@
  */
 
 #include <stdbool.h>
+
+#include "vector.h"
+
 #pragma once
 
 /**
@@ -89,6 +92,18 @@ typedef enum {
 
 // Need to forward-declare
 struct ast_node_s;
+
+/**
+ * \brief Data struct for a sequence.
+ *
+ * Contains information for a sequence. It is a list of children.
+ * The vector for the children will have to be created using the new
+ * vector function provided in `vector.h`.
+ */
+typedef struct {
+    /// A vector of pointer to the child nodes for this sequence
+    vector_t *children;
+} seq_n;
 
 /**
  * \brief Data struct for a mutable variable.
@@ -202,6 +217,7 @@ typedef struct {
  * relevant for each node type/operation/symbol.
  */
 typedef union node_data {
+    seq_n sequence;
     var_n var;
     const_n constant;
     decl_n declaration;
@@ -230,12 +246,6 @@ typedef struct ast_node_s {
 
     /// Data relevant for the node type, if applicable.
     node_data_u data;
-
-    /// The pointers to the child nodes of this node
-    struct ast_node_s **children;
-
-    /// The number of children this node has
-    unsigned int num_children;
 } ast_node_t;
 
 /// The global root node of the AST. This is an empty _no-op_ node. It
@@ -251,25 +261,43 @@ extern ast_node_t *ast_root;
  * If it does not already exist then it will be initialized and allocated.
  * This function returns a pointer to the existing global variable, which
  * can be ignored, as you can just reference `ast_root`.
+ *
+ * This node will need to be free'd.
+ *
+ * \return A pointer to the global root node designated ast the root of the
+ *     AST
  */
 ast_node_t *get_root();
 
 /** Create/allocate an AST node
  *
- * This initializes a node with no children and no type.
+ * This initializes a node with no children and no type. This node will need
+ * to be free'd.
+ *
+ * \return A newly allocated node
  */
 ast_node_t *create_node();
 
 /** Create/allocate an AST node with the supplied type.
  *
- * This initializes a node with the provided type, and no children.
+ * This initializes a node with the provided type, and no children. This node
+ * will need to be free'd.
+ *
+ * \param[in] type The type information for the node. This will be copied into
+ *     the node struct
+ * \return A newly allocated node
  */
 ast_node_t *create_node_type(type_t type);
 
 /** Create/allocate an AST node with the supplied type and data struct
  *
  * This is a convenience function to initialize a node with a type and some
- * supplied data.
+ * supplied data. This node will need to be free'd.
+ *
+ * \param[in] type The type information for the node. This will be copied into
+ *     the node struct
+ * \param[in] data A valid structure with relevant information for the node.
+ * \return A newly allocated node
  */
 ast_node_t *create_node_type_data(type_t type, node_data_u data);
 
@@ -277,11 +305,7 @@ ast_node_t *create_node_type_data(type_t type, node_data_u data);
  *
  * Deletes an AST node, given a pointer. This will free the node and its
  * internal structs.
+ *
+ * \param[out] node A pointer to a node which will be free'd.
  */
 void delete_node(ast_node_t *node);
-
-/** Add a child to a node
- *
- * Given a pointer to an AST node, add another node as a child to that node.
- */
-void add_child(ast_node_t *node, ast_node_t *child);

@@ -9,12 +9,14 @@
 #include <stdlib.h>
 
 #include "ast.h"
+#include "vector.h"
 
 // Define the global root (NULL at default to indicate it hasn't been
 // initialized)
 ast_node_t *ast_root = NULL;
 
-/** Retrieve the root node of the AST
+/**
+ * \brief Retrieve the root node of the AST
  *
  * If it does not already exist then it will be initialized and allocated.
  * This function returns a pointer to the existing global variable, which
@@ -29,22 +31,20 @@ ast_node_t *get_root() {
     return ast_root;
 }
 
-/** Create/allocate an AST node
+/**
+ * \brief Create/allocate an AST node
  *
- * This initializes a node with no children and no type.
+ * This initializes a node with no type.
  */
 ast_node_t *create_node() {
     ast_node_t *node = malloc(sizeof(ast_node_t));
-    node->num_children = 0;
-
-    // arbitrarily allocate space for 256 children
-    node->children = malloc(sizeof(ast_node_t *) * 256);
     return node;
 }
 
-/** Create/allocate an AST node with the supplied type.
+/**
+ * \brief Create/allocate an AST node with the supplied type.
  *
- * This initializes a node with the provided type, and no children.
+ * This initializes a node with the provided type
  */
 ast_node_t *create_node_type(type_t type) {
     ast_node_t *node = create_node();
@@ -52,7 +52,8 @@ ast_node_t *create_node_type(type_t type) {
     return node;
 }
 
-/** Create/allocate an AST node with the supplied type and data struct
+/**
+ * \brief Create/allocate an AST node with the supplied type and data struct
  *
  * This is a convenience function to initialize a node with a type and some
  * supplied data.
@@ -63,28 +64,29 @@ ast_node_t *create_node_type_data(type_t type, node_data_u data) {
     return node;
 }
 
-/** Delete a provided AST node
+/**
+ * \brief Delete a provided AST node
  *
  * Deletes an AST node, given a pointer. This will free the node and its
  * internal structs.
  */
 void delete_node(ast_node_t *node) {
-    if (node->children != NULL)
-        free(node->children);
+    if (node->n_type == T_SEQ)
+        vector_delete(node->data.sequence.children);
     free(node);
 }
 
-/** Add a child to a node
+/**
+ * \brief Convenience function to create a sequence AST node
  *
- * Given a pointer to an AST node, add another node as a child to that node.
+ * \return A new node of type `T_SEQ` and an allocated vector
+ *     for the node's children
  */
-void add_child(ast_node_t *node, ast_node_t *child) {
-    ast_node_t **array = node->children;
-
-    // add child to the end of the list and increment the number of children
-    // currently in the child
-    *(array + node->num_children) = child;
-    node->num_children++;
+ast_node_t *create_node_seq() {
+    ast_node_t *node = create_node_type(T_SEQ);
+    node_data_u data;
+    data.sequence = (seq_n){vector_new()};
+    return node;
 }
 
 /**

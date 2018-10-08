@@ -93,4 +93,5 @@ ast_node_t *create_node_seq() {
 /**
  * \brief Walk through a tree and recreate the program based on the tree
  */
-void recreate_program(ast_node_t *tree) { /* TODO */ }
+void recreate_program(ast_node_t *tree) { /* TODO */
+}

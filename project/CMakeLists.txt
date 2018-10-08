@@ -9,6 +9,7 @@ endif()
 
 # enable compile_commands for language servers
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(C_STANDARD C11)
 project(minic LANGUAGES C)
 set(program_name minic)

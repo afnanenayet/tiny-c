@@ -59,11 +59,3 @@ add_executable(${program_name}
     ${BISON_MiniCParser_OUTPUTS}
     ${FLEX_MiniCScanner_OUTPUTS}
     )
-
-# creating a library for the unit tests
-add_library(minic_lib
-    ${PROJECT_SOURCE_DIR}/src/ast.c
-    ${PROJECT_SOURCE_DIR}/src/minic.c
-    ${PROJECT_SOURCE_DIR}/src/vector.c
-    ${PROJECT_SOURCE_DIR}/src/pretty_print.c
-    )

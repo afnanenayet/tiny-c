@@ -46,3 +46,8 @@ The CMake file also contains information so Doxygen documentation can be
 generated through the Cmake build system. It will create a target called
 `docs` that will invoke doxygen and output documentation in the build
 folder.
+
+## TODO
+
+- [ ] semantic analysis functions
+- [ ] tree walk helper functions

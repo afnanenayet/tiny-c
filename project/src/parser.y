@@ -58,7 +58,8 @@ void yyerror(const char *str);
 %type<val> LITERAL
 %type<id> VAR
 %type<node> program expression while if_else seq term declaration assignment
-%type<node> if_stmt else_stmt code_block statement main_func
+%type<node> if_stmt else_stmt code_block statement main_func return_stmt
+%type<node> function_block
 %type<binary_op> b_op
 %type<unary_op> u_op
 
@@ -82,10 +83,26 @@ code_block:
             $$ = NULL;
           }
 
+function_block:
+              S_BRACE seq return_stmt E_BRACE {
+                  ast_node_t *seq = $2;
+                  vector_t *vec = seq->data.sequence.children;
+                  vector_add(vec, $3);
+                  $$ = seq;
+              }
+              | S_BRACE return_stmt E_BRACE {
+                  $$ = $2;
+              }
+
 main_func:
-         INT MAIN_ID S_PAREN E_PAREN code_block {
+         INT MAIN_ID S_PAREN E_PAREN function_block {
             $$ = $5;
          }
+
+return_stmt:
+           RET term SEMI {
+               $$ = $2; 
+           }
 
 seq:
    statement {
@@ -97,6 +114,14 @@ seq:
        $$ = seq;
    }
    | seq statement {
+       ast_node_t *seq = $1;
+       ast_node_t *stmt = $2;
+
+       vector_t *vec = seq->data.sequence.children;
+       vector_add(vec, stmt);
+       $$ = seq;
+   }
+   | seq code_block {
        ast_node_t *seq = $1;
        ast_node_t *stmt = $2;
 
@@ -116,6 +141,9 @@ expression:
             data.u_expr = (uexpr_n) {$1, $2};
             $$ = create_node_type_data(T_UEXP, data);
           }
+          | term {
+              $$ = $1;
+          }
 
 statement:
          assignment SEMI { $$ = $1; }
@@ -124,17 +152,7 @@ statement:
          | declaration SEMI { $$ = $1; }
 
 assignment:
-          VAR ASSIGN LITERAL {
-              // create the literal value node
-              node_data_u lval_data;
-              lval_data.literal = (lval_n) { $3 };
-              ast_node_t *literal = create_node_type_data(T_LVAL, lval_data);
-
-              node_data_u data;
-              data.var = (var_n) { $1, literal };
-              $$ = create_node_type_data(T_VAR, data);
-          }
-          | VAR ASSIGN term {
+          VAR ASSIGN expression {
               node_data_u data;
               data.var = (var_n) {$1, $3};
               ast_node_t *node = create_node_type_data(T_VAR, data);
@@ -205,6 +223,11 @@ term:
          node_data_u data;
          data.var = (var_n) { $1, 0 };
          $$ = create_node_type_data(T_VAR, data);
+    }
+    | LITERAL {
+        node_data_u data;
+        data.literal = (lval_n) { $1 };
+        $$ = create_node_type_data(T_LVAL, data);
     }
 
 b_op:

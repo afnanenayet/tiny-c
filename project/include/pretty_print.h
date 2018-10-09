@@ -20,4 +20,4 @@
  *
  * \param[in] node A node with type from the abstract syntax tree
  */
-void node_print(ast_node_t *node);
+void node_print(const ast_node_t *node);

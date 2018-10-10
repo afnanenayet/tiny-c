@@ -55,12 +55,14 @@ void yyerror(const char *str);
 %token NO_ELSE
 %token RET
 %token MAIN_ID
+%token PRINT_ID
+%token STR
 
 %type<val> LITERAL
-%type<id> VAR
+%type<id> VAR STR
 %type<node> program expression while if_else seq term declaration assignment
 %type<node> if_stmt else_stmt code_block statement main_func return_stmt
-%type<node> function_block /*function*/
+%type<node> function_block /*function*/ print_function
 %type<binary_op> b_op
 %type<unary_op> u_op
 
@@ -97,6 +99,20 @@ function:
             $$ = create_node_type_data(T_FUNC, data);
         }
 */
+
+print_function:
+              PRINT_ID S_PAREN STR E_PAREN {
+                  // create child sequence
+                  node_data_u str_data;
+                  str_data.strval = (strval_n) { $3 };
+                  ast_node_t *str_node = create_node_type_data(T_STR,
+                                                               str_data);
+                  printf("string: %s\n", $3); // TODO remove
+                  // create function node
+                  node_data_u fn_data;
+                  fn_data.func = (func_n) { strdup("main"), str_node};
+                  $$ = create_node_type_data(T_FUNC, fn_data);
+              }
 
 function_block:
               S_BRACE seq return_stmt E_BRACE {
@@ -176,6 +192,7 @@ statement:
          | while { $$ = $1; }
          | if_else { $$ = $1; }
          | declaration SEMI { $$ = $1; }
+         | print_function SEMI { $$ = $1; }
 
 assignment:
           VAR ASSIGN expression {

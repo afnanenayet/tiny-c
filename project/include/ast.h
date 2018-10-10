@@ -42,6 +42,9 @@ typedef enum {
     /// a literal value
     T_LVAL,
 
+    /// a special cased string value
+    T_STR,
+
     /// a function
     T_FUNC,
 } type_t;
@@ -140,6 +143,18 @@ typedef struct {
 } lval_n;
 
 /**
+ * \brief Data struct for a string literal value.
+ *
+ * This struct is meant to be used with the print statement.
+ * The data passed into the struct must be malloc'd, and later
+ * free'd.
+ */
+typedef struct {
+    /// The literal value, the string must be allocated
+    char *lval;
+} strval_n;
+
+/**
  * \brief Data struct for an if/else construct
  */
 typedef struct {
@@ -228,6 +243,7 @@ typedef struct {
  */
 typedef union node_data {
     lval_n literal;
+    strval_n strval;
     seq_n sequence;
     var_n var;
     const_n constant;

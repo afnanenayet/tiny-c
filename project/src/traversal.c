@@ -51,6 +51,8 @@ vector_t *get_child_nodes(const ast_node_t *node) {
         children = NULL;
         break;
     case T_DECL:
+        vector_delete(children);
+        children = NULL;
         break;
     default:
         vector_delete(children);

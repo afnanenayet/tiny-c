@@ -91,6 +91,9 @@ code_block:
             $$ = NULL;
           }
 
+/* Currently don't support any functions besides the main function, but
+ * may need to in the future.
+ */
 /*
 function:
         INT VAR S_PAREN E_PAREN function_block {
@@ -107,11 +110,15 @@ print_function:
                   str_data.strval = (strval_n) { $3 };
                   ast_node_t *str_node = create_node_type_data(T_STR,
                                                                str_data);
-                  printf("string: %s\n", $3); // TODO remove
                   // create function node
                   node_data_u fn_data;
                   fn_data.func = (func_n) { strdup("main"), str_node};
                   $$ = create_node_type_data(T_FUNC, fn_data);
+              }
+              | PRINT_ID S_PAREN expression E_PAREN {
+                  node_data_u data;
+                  data.func = (func_n) { strdup("main"), $3 };
+                  $$ = create_node_type_data(T_FUNC, data);
               }
 
 function_block:

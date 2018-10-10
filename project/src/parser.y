@@ -110,7 +110,7 @@ print_function:
                   str_data.strval = (strval_n) { $3 };
                   ast_node_t *str_node = create_node_type_data(T_STR,
                                                                str_data);
-                  // create function node
+                  // create function node and add the child string node
                   node_data_u fn_data;
                   fn_data.func = (func_n) { strdup("main"), str_node};
                   $$ = create_node_type_data(T_FUNC, fn_data);

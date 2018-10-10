@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "ast.h"
 #include "vector.h"
@@ -59,7 +60,7 @@ void yyerror(const char *str);
 %type<id> VAR
 %type<node> program expression while if_else seq term declaration assignment
 %type<node> if_stmt else_stmt code_block statement main_func return_stmt
-%type<node> function_block
+%type<node> function_block /*function*/
 %type<binary_op> b_op
 %type<unary_op> u_op
 
@@ -69,7 +70,12 @@ void yyerror(const char *str);
 %%
 
 program:
-       main_func {
+       seq main_func {
+            vector_t *vec = ast_root->data.sequence.children;
+            vector_add(vec, $1);
+            vector_add(vec, $2);
+       }
+       | main_func {
             vector_t *vec = ast_root->data.sequence.children;
             vector_add(vec, $1);
        }
@@ -82,6 +88,15 @@ code_block:
             // empty code blocks are legal
             $$ = NULL;
           }
+
+/*
+function:
+        INT VAR S_PAREN E_PAREN function_block {
+            node_data_u data;
+            data.func = { $2, $5 };
+            $$ = create_node_type_data(T_FUNC, data);
+        }
+*/
 
 function_block:
               S_BRACE seq return_stmt E_BRACE {
@@ -96,16 +111,26 @@ function_block:
 
 main_func:
          INT MAIN_ID S_PAREN E_PAREN function_block {
-            $$ = $5;
+            node_data_u data;
+            data.func = (func_n) { strdup("main"), $5 };
+            $$ = create_node_type_data(T_FUNC, data);
          }
 
 return_stmt:
            RET term SEMI {
-               $$ = $2; 
+               $$ = $2;
            }
 
 seq:
    statement {
+       ast_node_t *expr = $1;
+       ast_node_t *seq = create_node_seq();
+
+       vector_t *vec = seq->data.sequence.children;
+       vector_add(vec, expr);
+       $$ = seq;
+   }
+   | code_block {
        ast_node_t *expr = $1;
        ast_node_t *seq = create_node_seq();
 
@@ -129,6 +154,7 @@ seq:
        vector_add(vec, stmt);
        $$ = seq;
    }
+   ;
 
 expression:
           term b_op term {
@@ -160,7 +186,7 @@ assignment:
           }
 
 while:
-        WHILE S_PAREN expression E_PAREN code_block {
+     WHILE S_PAREN expression E_PAREN code_block {
             ast_node_t *condition = $3;
             ast_node_t *body = $5;
             node_data_u data;
@@ -190,12 +216,12 @@ if_stmt:
        IF S_PAREN expression E_PAREN code_block {
            node_data_u data;
            data.if_else = (if_else_n) { $3, $5, NULL };
-           $$ = create_node_type_data(T_IF, data);
+           $$ = create_node_type_data(T_IF_ELSE, data);
        }
        | IF S_PAREN expression E_PAREN statement {
            node_data_u data;
            data.if_else = (if_else_n) { $3, $5, NULL };
-           $$ = create_node_type_data(T_IF, data);
+           $$ = create_node_type_data(T_IF_ELSE, data);
        }
 
 else_stmt:

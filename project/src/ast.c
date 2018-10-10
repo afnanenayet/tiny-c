@@ -47,7 +47,7 @@ ast_node_t *create_node() {
  *
  * This initializes a node with the provided type
  */
-ast_node_t *create_node_type(type_t type) {
+ast_node_t *create_node_type(const type_t type) {
     ast_node_t *node = create_node();
     node->n_type = type;
     return node;
@@ -59,7 +59,7 @@ ast_node_t *create_node_type(type_t type) {
  * This is a convenience function to initialize a node with a type and some
  * supplied data.
  */
-ast_node_t *create_node_type_data(type_t type, node_data_u data) {
+ast_node_t *create_node_type_data(const type_t type, const node_data_u data) {
     ast_node_t *node = create_node_type(type);
     node->data = data;
     return node;
@@ -88,10 +88,4 @@ ast_node_t *create_node_seq() {
     data.sequence = (seq_n){vector_new()};
     ast_node_t *node = create_node_type_data(T_SEQ, data);
     return node;
-}
-
-/**
- * \brief Walk through a tree and recreate the program based on the tree
- */
-void recreate_program(ast_node_t *tree) { /* TODO */
 }

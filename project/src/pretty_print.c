@@ -149,7 +149,7 @@ void node_print(const ast_node_t *node) {
     case T_VAR:
         node_t_var_print(node);
         break;
-    case T_IF:
+    case T_IF_ELSE:
         node_t_if_print(node);
         break;
     case T_SEQ:

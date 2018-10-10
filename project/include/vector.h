@@ -41,11 +41,23 @@ vector_t *vector_new();
 /**
  * \brief Delete a vector
  *
- * This function deallocates a vector
+ * This function deallocates a vector. It does _not_ deallocate the objects
+ * it points to.
  *
  * \param[in] vec The vector to delete
  */
 void vector_delete(vector_t *vec);
+
+/**
+ * \brief Make a copy of a given vector.
+ *
+ * Makes a copy of a given vector. This copy must be free'd.
+ *
+ * \param[in] The old vector to be copied
+ * \return A new vector with pointers to all of the elements as the other
+ * vector in the same order.
+ */
+vector_t *vector_copy(vector_t *old);
 
 /**
  * \brief Add a pointer to the vector
@@ -64,7 +76,7 @@ bool vector_add(vector_t *vec, void *item);
  * \param[in] vec The vector to operate on
  * \return The number of elements in the vector
  */
-unsigned long vector_len(vector_t *vec);
+unsigned long vector_len(const vector_t *vec);
 
 /**
  * \brief Get the element at position `i` in the vector
@@ -78,4 +90,4 @@ unsigned long vector_len(vector_t *vec);
  * \return A pointer to the element at `i`, if `i` is out of bounds, then
  *     this returns NULL pointer.
  */
-void *vector_get(vector_t *vec, unsigned long i);
+void *vector_get(const vector_t *vec, unsigned long i);

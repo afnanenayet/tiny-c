@@ -83,6 +83,8 @@ bool vector_add(vector_t *vec, void *item) {
     return true;
 }
 
-unsigned long vector_len(vector_t *vec) { return vec->n; }
+unsigned long vector_len(const vector_t *vec) { return vec->n; }
 
-void *vector_get(vector_t *vec, unsigned long i) { return *(vec->vec + i); }
+void *vector_get(const vector_t *vec, unsigned long i) {
+    return *(vec->vec + i);
+}

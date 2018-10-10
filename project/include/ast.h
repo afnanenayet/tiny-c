@@ -22,10 +22,7 @@ typedef enum {
     T_CONST,
 
     /// if statement
-    T_IF,
-
-    /// else statement
-    T_ELSE,
+    T_IF_ELSE,
 
     /// while loop
     T_WHILE,
@@ -44,6 +41,9 @@ typedef enum {
 
     /// a literal value
     T_LVAL,
+
+    /// a function
+    T_FUNC,
 } type_t;
 
 /**

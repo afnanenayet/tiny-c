@@ -1,4 +1,6 @@
 %{
+#include <stdio.h>
+
 #include "ast.h"
 #include "parser.h"
 
@@ -33,7 +35,7 @@ extern int yylex();
 "!" { return NOT_TOK; }
 "main" { return MAIN_ID; }
 "print" { return PRINT_ID; }
-\"*.\" { yylval.id = strdup(yytext); return STR; };
+\".*\" { yylval.id = strdup(yytext); return STR; };
 \n ;
 [ \t]+ ;
 [0-9]+ { yylval.val = atoi(yytext); return LITERAL; }

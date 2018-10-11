@@ -27,36 +27,35 @@
  * returned must be free'd.
  */
 vector_t *get_child_nodes(const ast_node_t *node) {
-    vector_t *children = vector_new();
+    vector_t *children = NULL;
 
     switch (node->n_type) {
-    case T_VAR:
-        vector_delete(children);
-        children = NULL;
-        break;
-    case T_CONST:
-        vector_delete(children);
-        children = NULL;
-        break;
     case T_IF_ELSE:
+        children = vector_new();
+        vector_add(children, node->data.if_else.cond);
+        vector_add(children, node->data.if_else.if_stmt);
+        vector_add(children, node->data.if_else.else_stmt);
         break;
     case T_SEQ:
+        children = vector_copy(node->data.sequence.children);
         break;
     case T_BEXP:
+        children = vector_new();
+        vector_add(children, node->data.b_expr.lhs);
+        vector_add(children, node->data.b_expr.rhs);
         break;
     case T_UEXP:
+        children = vector_new();
+        vector_add(children, node->data.u_expr.expr);
         break;
-    case T_LVAL:
-        vector_delete(children);
-        children = NULL;
-        break;
-    case T_DECL:
-        vector_delete(children);
-        children = NULL;
-        break;
+    case T_WHILE:
+        children = vector_new();
+        vector_add(children, node->data.while_loop.cond);
+        vector_add(children, node->data.while_loop.body);
+    case T_FUNC:
+        children = vector_new();
+        vector_add(children, node->data.func.fn_seq);
     default:
-        vector_delete(children);
-        children = NULL;
         break;
     }
     return children;

@@ -88,3 +88,14 @@ unsigned long vector_len(const vector_t *vec) { return vec->n; }
 void *vector_get(const vector_t *vec, unsigned long i) {
     return *(vec->vec + i);
 }
+
+vector_t *vector_copy(vector_t *old) {
+    vector_t *vec = malloc(sizeof(vector_t));
+    vec->vec = malloc(sizeof(vec->vec));
+    vec->n = old->n;
+
+    for (unsigned long i = 0; i < old->n; i++) {
+        *(vec->vec + i) = *(old->vec + i);
+    }
+    return vec;
+}

@@ -23,3 +23,11 @@
  * returned must be free'd.
  */
 vector_t *get_child_nodes(const ast_node_t *node);
+
+/**
+ * \brief Delete a tree given the root node
+ *
+ * This recursively deletes the tree given some root node
+ * \param[out] The root node of the tree (or sub-tree) to delete
+ */
+void delete_tree(ast_node_t *root);

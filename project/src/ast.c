@@ -72,21 +72,21 @@ ast_node_t *create_node_type_data(const type_t type, const node_data_u data) {
  * internal structs.
  */
 void delete_node(ast_node_t *node) {
-    switch(node->n_type) {
-        case T_SEQ:
-            vector_delete(node->data.sequence.children);
-            break;
-        case T_FUNC:
-            free(node->data.func.name);
-            break;
-        case T_VAR:
-            free(node->data.var.id);
-            break;
-        case T_CONST:
-            free(node->data.constant.id);
-            break;
-        default:
-            break;
+    switch (node->n_type) {
+    case T_SEQ:
+        vector_delete(node->data.sequence.children);
+        break;
+    case T_FUNC:
+        free(node->data.func.name);
+        break;
+    case T_VAR:
+        free(node->data.var.id);
+        break;
+    case T_CONST:
+        free(node->data.constant.id);
+        break;
+    default:
+        break;
     }
     free(node);
 }

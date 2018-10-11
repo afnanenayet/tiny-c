@@ -20,7 +20,7 @@
  */
 typedef struct vector_s {
     /// The number of elements in the vector
-    unsigned long n;
+    size_t n;
 
     /// The amount of memory that has been allocated to the vector struct
     size_t size;

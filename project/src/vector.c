@@ -91,7 +91,7 @@ void *vector_get(const vector_t *vec, unsigned long i) {
 
 vector_t *vector_copy(vector_t *old) {
     vector_t *vec = malloc(sizeof(vector_t));
-    vec->vec = malloc(sizeof(vec->vec));
+    vec->vec = malloc(sizeof(void *) * old->n);
     vec->n = old->n;
 
     for (unsigned long i = 0; i < old->n; i++) {

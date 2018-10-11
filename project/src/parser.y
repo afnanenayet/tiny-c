@@ -62,7 +62,7 @@ void yyerror(const char *str);
 %type<id> VAR STR
 %type<node> program expression while if_else seq term declaration assignment
 %type<node> if_stmt else_stmt code_block statement main_func return_stmt
-%type<node> function_block /*function*/ print_function
+%type<node> function_block /*function*/ print_function decl_seq
 %type<binary_op> b_op
 %type<unary_op> u_op
 
@@ -72,7 +72,7 @@ void yyerror(const char *str);
 %%
 
 program:
-       seq main_func {
+       decl_seq main_func {
             vector_t *vec = ast_root->data.sequence.children;
             vector_add(vec, $1);
             vector_add(vec, $2);
@@ -102,6 +102,30 @@ function:
             $$ = create_node_type_data(T_FUNC, data);
         }
 */
+
+/* Declaration sequence:
+ *
+ * Declarations are valid before the main function. They are the only
+ * statement that is valid before the main function (at least in this
+ * assignment).
+ */
+decl_seq:
+        declaration SEMI {
+           ast_node_t *expr = $1;
+           ast_node_t *seq = create_node_seq();
+
+           vector_t *vec = seq->data.sequence.children;
+           vector_add(vec, expr);
+           $$ = seq;
+        }
+        | decl_seq declaration SEMI {
+           ast_node_t *seq = $1;
+           ast_node_t *stmt = $2;
+
+           vector_t *vec = seq->data.sequence.children;
+           vector_add(vec, stmt);
+           $$ = seq;
+        }
 
 print_function:
               PRINT_ID S_PAREN STR E_PAREN {
@@ -296,5 +320,5 @@ u_op:
 %%
 
 void yyerror(const char *str) {
-    printf("Error: unable to parse string \"%s\"\n", str);
+    fprintf(stderr, "Syntax error encountered\n");
 }

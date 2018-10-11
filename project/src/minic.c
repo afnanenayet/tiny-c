@@ -61,11 +61,21 @@ static bool semantic_check_helper(const ast_node_t *node) {
     // add declarations to the hash table
     if (node->n_type == T_DECL) {
         e.key = node->data.declaration.id;
+
+        // first check if the variable has been declared before
+        ep = hsearch(e, FIND);
+
+        if (ep != NULL) {
+            fprintf(stderr, "(semantic error) variable or constant `%s` declared "
+                            "multiple times\n", e.key);
+            return false;
+        }
         ep = hsearch(e, ENTER);
 
         // ep is null on errors
         if (ep == NULL) {
             fprintf(stderr, "Entry to hashtable failed\n");
+            return false;
         }
     } else if (node->n_type == T_VAR || node->n_type == T_CONST) {
         // if a value is being assigned to some variable, we must check that
@@ -78,8 +88,31 @@ static bool semantic_check_helper(const ast_node_t *node) {
 
         // if the element cannot be found, ep will be NULL (this means that
         // the assignment is illegal)
-        if (ep == NULL)
+        if (ep == NULL) {
+            fprintf(stderr,
+                    "(semantic error) variable or constant `%s` was assigned "
+                    "before declaration\n",
+                    e.key);
             return false;
+        } else if (ep->data != NULL) {
+            fprintf(stderr,
+                    "(semantic error) multiple definitions of variable or "
+                    "constant `%s`\n",
+                    e.key);
+            return false;
+        }
+
+        // insert the element back into the hash table, pointing to the
+        // assignment node, so that we can ensure variables aren't defined
+        // multiple times
+        e.data = (void *) node;
+        ep = hsearch(e, ENTER);
+
+        // ep is only null if there is an error with the hashtable
+        if (ep == NULL) {
+            fprintf(stderr, "Entry to hashtable failed\n");
+            return false;
+        }
     }
     return true;
 }
@@ -89,16 +122,21 @@ int main(void) {
     ast_root = create_node_seq();
 
     // generate the AST
-    yyparse();
+    int parse_status = yyparse();
+
+    if (parse_status != 0) {
+        return 1;
+    }
 
     // perform semantic check
     bool is_semantically_valid = semantic_check(ast_root);
 
+    // not printing anything for errors because errors are already printed
     if (is_semantically_valid)
         printf("Code is semantically valid\n");
-    else
-        fprintf(stderr, "Code is not semantically valid\n");
-
     delete_tree(ast_root);
-    return 0;
+
+    if (is_semantically_valid)
+        return 0;
+    return 1;
 }

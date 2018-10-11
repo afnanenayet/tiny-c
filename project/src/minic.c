@@ -19,7 +19,9 @@
  * \param[in] tree the root node of the AST
  * \return whether the AST is semantically valid
  */
-bool semantic_check(ast_node_t *tree) { return false; }
+bool semantic_check(ast_node_t *tree) { 
+    return false; 
+}
 
 int main(void) {
     // create ast root

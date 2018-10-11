@@ -6,6 +6,16 @@ This directory contains the files for the overall project.
 
 ## Development
 
+### Dependencies
+
+This project uses Bison and Flex (latest versions of each). It has not been
+designed with yacc or lex, so I can't guarantee whether they will work.
+
+You can install flex and bison using homebrew or your desired package
+manager.
+
+### Build instructions
+
 This project is set up with `CMake`. To build this project, do an
 out-of-source build. I usually use a directory called `build`.
 

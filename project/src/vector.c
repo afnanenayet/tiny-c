@@ -86,6 +86,8 @@ bool vector_add(vector_t *vec, void *item) {
 unsigned long vector_len(const vector_t *vec) { return vec->n; }
 
 void *vector_get(const vector_t *vec, unsigned long i) {
+    if (i < 0 || i >= vec->n)
+        return NULL;
     return *(vec->vec + i);
 }
 

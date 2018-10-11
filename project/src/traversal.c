@@ -19,7 +19,9 @@
  * \brief Get a vector with pointers to the child nodes of a particular node.
  *
  * This function is essentially a wrapper for a number of other node types,
- * and it provides a singular interface to get the children of a node.
+ * and it provides a singular interface to get the children of a node. This
+ * function has the side effect of allocating a new vector struct that will
+ * need to be deallocated.
  *
  * \param[in] node An input node
  * \return A vector with pointers to the child nodes of the given node. If
@@ -73,7 +75,7 @@ void delete_tree(ast_node_t *root) {
     // recursively delete all children
     if (children != NULL)
         for (unsigned long i = 0; i < children->n; i++)
-            delete_tree(vector_get(children, i));
+            delete_tree((ast_node_t *)vector_get(children, i));
 
     // delet current node _after_ deleting children
     delete_node(root);

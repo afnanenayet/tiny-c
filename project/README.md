@@ -34,7 +34,7 @@ You can also run `build.sh`, which will perform the same steps.
 ```
 This will create a binary in the build folder called `minic`.
 
-You can invoke it with `./build/minic`. It will take input from
+You can invoke it with `build/minic`. It will take input from
 `stdin`.
 
 ### Documentation

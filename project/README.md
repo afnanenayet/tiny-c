@@ -10,6 +10,8 @@ This directory contains the files for the overall project.
 
 This project uses Bison and Flex (latest versions of each). It has not been
 designed with yacc or lex, so I can't guarantee whether they will work.
+Doxygen is an optional dependency, but is not required if you don't want to
+read the documentation, which is generated from the function comments.
 
 You can install flex and bison using homebrew or your desired package
 manager.
@@ -20,19 +22,20 @@ This project is set up with `CMake`. To build this project, do an
 out-of-source build. I usually use a directory called `build`.
 
 Example:
-
 ```sh
 mkdir -p build;
 cd build;
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
-
 You can also run `build.sh`, which will perform the same steps.
-
 ```sh
 ./build.sh
 ```
+This will create a binary in the build folder called `minic`.
+
+You can invoke it with `./build/minic`. It will take input from
+`stdin`.
 
 ### Documentation
 
@@ -57,10 +60,5 @@ If you're in the build folder, you can run
 ```sh
 make docs
 ```
-
-(or whichever build system you're using)
-
-## TODO
-
-- [ ] semantic analysis functions
-- [ ] tree walk helper functions
+(or whichever build system you're using), and it will generate the HTML output
+in `docs/html`. The entry point is `docs/html/index.html`.

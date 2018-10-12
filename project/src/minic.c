@@ -7,6 +7,7 @@
 
 #include <search.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "ast.h"
 #include "parser.h"
@@ -34,14 +35,37 @@ static bool semantic_check_helper(const ast_node_t *node);
  */
 static bool semantic_check(const ast_node_t *root);
 
+/**
+ * \brief Recusively check whether the AST subtree is semantically valid.
+ *
+ * This function is a helper function for the `semantic_check` wrapper method.
+ * It recursively checks some given node to ensure that all of the node's
+ * subtrees are semantically valid.
+ *
+ * It checks for the following criteria:
+ *     - variables are declared once
+ *     - variables are assigned once
+ *     - variables are declared before assignment
+ *
+ * \param[in] node The root node of the subtree you want to verify
+ * \return Whether the given subtree is semantically valid
+ */
+static bool semantic_check_helper(const ast_node_t *node);
+
 // ***************************************************************************
 // Private function definitions
 // ***************************************************************************
 
 static bool semantic_check(const ast_node_t *root) {
-    // create the hashtable (search.h)
-    hcreate(256);
-    return semantic_check_helper(root);
+    // create the hashtable (search.h), bail if there's an error
+    if (hcreate(256) == 0) {
+        fprintf(stderr, "Failed to create hashtable\n");
+        return false;
+    }
+
+    bool is_valid = semantic_check_helper(root);
+    hdestroy(); // delete the hashtable
+    return is_valid;
 }
 
 static bool semantic_check_helper(const ast_node_t *node) {
@@ -60,14 +84,18 @@ static bool semantic_check_helper(const ast_node_t *node) {
 
     // add declarations to the hash table
     if (node->n_type == T_DECL) {
-        e.key = node->data.declaration.id;
+        // need to duplicate the string because hcreate will free every key
+        // in the hash table, which will cause major issues with the AST
+        e.key = strdup(node->data.declaration.id);
 
         // first check if the variable has been declared before
         ep = hsearch(e, FIND);
 
         if (ep != NULL) {
-            fprintf(stderr, "(semantic error) variable or constant `%s` declared "
-                            "multiple times\n", e.key);
+            fprintf(stderr,
+                    "(semantic error) variable or constant `%s` declared "
+                    "multiple times\n",
+                    e.key);
             return false;
         }
         ep = hsearch(e, ENTER);
@@ -105,8 +133,7 @@ static bool semantic_check_helper(const ast_node_t *node) {
         // insert the element back into the hash table, pointing to the
         // assignment node, so that we can ensure variables aren't defined
         // multiple times
-        e.data = (void *) node;
-        ep = hsearch(e, ENTER);
+        ep->data = (void *)node;
 
         // ep is only null if there is an error with the hashtable
         if (ep == NULL) {
@@ -133,7 +160,7 @@ int main(void) {
 
     // not printing anything for errors because errors are already printed
     if (is_semantically_valid)
-        printf("Code is semantically valid\n");
+        printf("\nCode is semantically valid\n");
     delete_tree(ast_root);
 
     if (is_semantically_valid)

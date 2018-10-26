@@ -7,6 +7,9 @@
  * user to interact with LLVM IR code, so it's easier to optimize.
  */
 #include <llvm-c/Core.h>
+#include <stdbool.h>
+
+#pragma once
 
 /**
  * \brief Create an LLVM model from an LLVM IR file
@@ -20,3 +23,26 @@
  * \returns An LLVM module on success. On failure, it will return `NULL`.
  */
 LLVMModuleRef createLLVMModel(char *fp);
+
+/**
+ * \brief Iterate through each function in an LLVM module
+ *
+ * Given some module, this method loops through each function in the module.
+ *
+ * \param module The LLVM module to walk through
+ * \return Whether any part of the LLVM IR was changed as a result of some
+ * optimization routine.
+ */
+bool walkFunctions(LLVMModuleRef module);
+
+/**
+ * \brief Iterate through each basic block in some LLVM function
+ *
+ * Given some LLVM function, iterate through each basic block in that
+ * function.
+ *
+ * \param function The function to iterate through
+ * \return Whether any part of the LLVM IR was changed as a result of some
+ * optimization routine.
+ */
+bool walkBasicblocks(LLVMValueRef function);

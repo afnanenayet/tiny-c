@@ -8,28 +8,48 @@
  */
 #include <llvm-c/Core.h>
 #include <llvm-c/IRReader.h>
+#include <stdbool.h>
 #include <stdio.h>
 
+#include "llvm_utils.h"
 #include "print_utils.h"
 
 LLVMModuleRef createLLVMModel(char *fp) {
     char *err = 0;
-
     LLVMMemoryBufferRef ll_f = 0;
     LLVMModuleRef m = 0;
 
+    // try to read a file with LLVM
     LLVMCreateMemoryBufferWithContentsOfFile(fp, &ll_f, &err);
 
     if (err != NULL) {
         fprintln(stderr, err);
         return NULL;
     }
-
+    // See if LLVM can parse the IR file
     LLVMParseIRInContext(LLVMGetGlobalContext(), ll_f, &m, &err);
 
     if (err != NULL) {
         fprintln(stderr, err);
     }
-
     return m;
+}
+
+bool walkBasicblocks(LLVMValueRef function) {
+    for (LLVMBasicBlockRef basicBlock = LLVMGetFirstBasicBlock(function);
+         basicBlock; basicBlock = LLVMGetNextBasicBlock(basicBlock)) {
+        // TODO run optimization routine here
+    }
+    return false; // TODO change to a real value
+}
+
+bool walkFunctions(LLVMModuleRef module) {
+    for (LLVMValueRef function = LLVMGetFirstFunction(module); function;
+         function = LLVMGetNextFunction(function)) {
+        // TODO do we need this? Instructions say there will only be one
+        // function in the input file? Does it really even matter...?
+        // const char* funcName = LLVMGetValueName(function);
+        return walkBasicblocks(function);
+    }
+    return false; // TODO change to a real value
 }

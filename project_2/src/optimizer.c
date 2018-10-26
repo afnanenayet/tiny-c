@@ -1,25 +1,35 @@
 /**
  * \file optimizer.c
+ * \author Afnan Enayet
  * \brief Contains functions pertaining to optimization of LLVM code
  *
- * This function contains function definitions for functions that provide
+ * This module contains function definitions for functions that provide
  * optimizations for LLVM code. These functions will modify the LLVM model
  * that is passed in.
  *
  * In this file, we implement constant propagation and constant folding.
  */
 
+/*** Private function prototypes ***/
+
 /**
- * \brief Optimize the program given the LLVM module
- *
- * This is essentially a wrapper function for the optimizations that
- * will be applied to the program. It contains a loop that calls each
- * optimization function and keeps looping/optimizing until each there are
- * no more changes applied, at which point we know the program has been
- * fully optimized.
- *
- * Right now, the following optimizations are called with this function:
- *     - constant propagation
- *     - constant folding
+ * \brief Perform constant propagation on a module
  */
+void optim_constant_propagation(void);
+
+/**
+ * \brief Perform constant folding on a module
+ */
+void optim_constant_folding(void);
+
+// TODO
+
+/*** Private function definitions ***/
+
+// TODO
+
+/*** Public function definitions ***/
+
+// TODO
+
 void optimize_program(void);

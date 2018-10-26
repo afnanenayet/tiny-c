@@ -1,5 +1,6 @@
 /**
  * \file main.c
+ * \author Afnan Enayet
  *
  * \brief The entry point into the optimizer program
  *
@@ -10,6 +11,9 @@
 
 #include <stdio.h>
 
+#include "llvm_utils.h"
+#include "print_utils.h"
+
 /**
  * \brief Main entry point into the program
  *
@@ -17,8 +21,18 @@
  * program.
  */
 int main(int argc, char *argv[]) {
+    // bail out if there is no input file
     if (argc < 2) {
-        fprintf(stderr, "Missing input filepath!\n");
+        fprintln(stderr, "Missing input filepath");
+        return 1;
+    }
+
+    // check whether the given file path is valid
+    char *fp = argv[1];
+    LLVMModuleRef m = createLLVMModel(fp);
+
+    if (m == NULL) {
+        fprintln(stderr, "Invalid filepath or file received");
         return 1;
     }
     return 0;

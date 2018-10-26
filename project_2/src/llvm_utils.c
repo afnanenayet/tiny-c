@@ -1,5 +1,6 @@
 /**
  * \file llvm_utils.c
+ * \author Afnan Enayet
  * \brief Utility functions for interacting with LLVM IR files
  *
  * This file contains function definitions for the `llvm_utils` module.

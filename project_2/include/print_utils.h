@@ -1,6 +1,7 @@
 /**
  * \file print_utils.h
  * \brief Useful tools to assist with printing
+ * \author Afnan Enayet
  *
  * A set of functions and macros that make printing a little more convenient.
  */

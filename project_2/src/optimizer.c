@@ -1,5 +1,12 @@
 /**
  * \file optimizer.c
+ * \brief Contains functions pertaining to optimization of LLVM code
+ *
+ * This function contains function definitions for functions that provide
+ * optimizations for LLVM code. These functions will modify the LLVM model
+ * that is passed in.
+ *
+ * In this file, we implement constant propagation and constant folding.
  */
 
 /**

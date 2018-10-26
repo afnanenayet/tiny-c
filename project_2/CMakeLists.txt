@@ -43,8 +43,8 @@ add_executable(${program_name}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/optimizer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/llvm_utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vec.c
     )
-
 target_link_libraries(${program_name}
     ${llvm_libs}
     ${core}

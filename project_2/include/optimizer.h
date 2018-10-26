@@ -9,7 +9,16 @@
  *
  * In this file, we implement constant propagation and constant folding.
  */
+#include <llvm-c/Core.h>
 
 #pragma once
 
-void optimize_program(void);
+/**
+ * \brief Optimize an LLVM program
+ *
+ * Given some LLVM model, optimize the program in the model until it reaches
+ * the fixed point.
+ *
+ * \param m The module to optimize
+ */
+void optimize_program(LLVMModuleRef m);

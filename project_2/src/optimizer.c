@@ -9,6 +9,9 @@
  *
  * In this file, we implement constant propagation and constant folding.
  */
+#include <llvm-c/Core.h>
+
+#include "optimizer.h"
 
 /*** Private function prototypes ***/
 
@@ -32,4 +35,4 @@ void optim_constant_folding(void);
 
 // TODO
 
-void optimize_program(void);
+void optimize_program(LLVMModuleRef m);

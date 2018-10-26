@@ -1,0 +1,3 @@
+[submodule "project_2/ext/uthash"]
+	path = project_2/ext/uthash
+	url = git@github.com:troydhanson/uthash.git

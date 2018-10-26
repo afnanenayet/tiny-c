@@ -1,25 +1,18 @@
 /**
  * \file optimizer.c
- *
- * \brief The entry point into the optimizer program
- *
- * This file contains the entry point and the main function for the optimizer.
- * It is as minimal as possible and only calls a function to begin the logic
- * for the actual optimization code.
  */
-
-#include <stdio.h>
 
 /**
- * \brief Main entry point into the program
+ * \brief Optimize the program given the LLVM module
  *
- * Parse command line arguments and call the main functions for the optimizer
- * program.
+ * This is essentially a wrapper function for the optimizations that
+ * will be applied to the program. It contains a loop that calls each
+ * optimization function and keeps looping/optimizing until each there are
+ * no more changes applied, at which point we know the program has been
+ * fully optimized.
+ *
+ * Right now, the following optimizations are called with this function:
+ *     - constant propagation
+ *     - constant folding
  */
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        fprintf(stderr, "Missing input filepath!\n");
-        return 1;
-    }
-    return 0;
-}
+void optimize_program(void);

@@ -39,5 +39,6 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 add_executable(${program_name}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/optimizer.c
     )

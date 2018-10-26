@@ -36,20 +36,22 @@ LLVMModuleRef createLLVMModel(char *fp) {
 }
 
 bool walkBasicblocks(LLVMValueRef function) {
+    bool changed = false;
     for (LLVMBasicBlockRef basicBlock = LLVMGetFirstBasicBlock(function);
          basicBlock; basicBlock = LLVMGetNextBasicBlock(basicBlock)) {
         // TODO run optimization routine here
     }
-    return false; // TODO change to a real value
+    return changed;
 }
 
 bool walkFunctions(LLVMModuleRef module) {
+    bool changed = false;
     for (LLVMValueRef function = LLVMGetFirstFunction(module); function;
          function = LLVMGetNextFunction(function)) {
         // TODO do we need this? Instructions say there will only be one
         // function in the input file? Does it really even matter...?
         // const char* funcName = LLVMGetValueName(function);
-        return walkBasicblocks(function);
+        changed = changed || walkBasicblocks(function);
     }
-    return false; // TODO change to a real value
+    return changed;
 }

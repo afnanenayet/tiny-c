@@ -50,4 +50,3 @@ target_link_libraries(${program_name}
     ${core}
     ${irreader}
     )
-    

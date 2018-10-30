@@ -45,6 +45,7 @@ bool walkBasicblocks(LLVMValueRef function) {
         val_vec_t *genSet = computeGenSet(basicBlock);
         vec_deinit(genSet); // TODO remove
         free(genSet);
+        genSet = NULL;
     }
     return changed;
 }

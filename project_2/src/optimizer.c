@@ -20,12 +20,12 @@
 /**
  * \brief Perform constant propagation on a module
  */
-void optim_constant_propagation(void);
+static void constProp(void);
 
 /**
  * \brief Perform constant folding on a module
  */
-void optim_constant_folding(void);
+static void constFold(void);
 
 
 // TODO

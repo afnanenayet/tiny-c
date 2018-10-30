@@ -10,15 +10,15 @@ set(C_STANDARD C11)
 set(program_name optimizer)
 
 # enable all warnings
-set(CMAKE_C_FLAGS
-    "${CMAKE_C_FLAGS} -Wall -Wpedantic -std=c11"
-    )
-set (CMAKE_C_FLAGS_DEBUG
-    "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
-    )
-set (CMAKE_LINKER_FLAGS_DEBUG
-    "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
-    )
+# set(CMAKE_C_FLAGS
+#     "${CMAKE_C_FLAGS} -Wall -Wpedantic -std=c11"
+#     )
+# set (CMAKE_C_FLAGS_DEBUG
+#     "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
+#     )
+# set (CMAKE_LINKER_FLAGS_DEBUG
+#     "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
+#     )
 
 # optional doxygen package to generate docs
 find_package(Doxygen)

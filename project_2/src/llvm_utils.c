@@ -43,7 +43,8 @@ bool walkBasicblocks(LLVMValueRef function) {
          basicBlock; basicBlock = LLVMGetNextBasicBlock(basicBlock)) {
         // TODO run optimization routine here
         val_vec_t *genSet = computeGenSet(basicBlock);
-        // vec_deinit(genSet); // TODO remove
+        vec_deinit(genSet); // TODO remove
+        free(genSet);
     }
     return changed;
 }
@@ -62,7 +63,9 @@ bool walkFunctions(LLVMModuleRef module) {
 
 val_vec_t *computeGenSet(LLVMBasicBlockRef bb) {
     // initialize the empty set
-    val_vec_t *bbSet;
+    // need to malloc because the library assumes the vector is already
+    // allocated and doesn't initialize the struct for you
+    val_vec_t *bbSet = malloc(sizeof(val_vec_t));
     vec_init(bbSet);
 
     // iterate over the instructions in the basic block
@@ -83,7 +86,7 @@ val_vec_t *computeGenSet(LLVMBasicBlockRef bb) {
         int i;
         LLVMValueRef val;
         vec_foreach(bbSet, val, i) {
-            LLVMValueRef oldStoreLoc = LLVMGetOperand(inst, 1);
+            LLVMValueRef oldStoreLoc = LLVMGetOperand(val, 1);
 
             if (oldStoreLoc == newStoreLoc) {
 #ifdef DEBUG

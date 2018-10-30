@@ -105,6 +105,8 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
     val_vec_t *killSet = malloc(sizeof(val_vec_t));
     vec_init(killSet);
     val_vec_t *storeSet = malloc(sizeof(val_vec_t));
+
+    /// set $S$
     vec_init(storeSet);
 
     // compute some set S of all the constant store instructions in some
@@ -113,11 +115,57 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
          inst = LLVMGetNextInstruction(inst)) {
         if (LLVMIsAStoreInst(inst)) {
 #ifdef DEBUG
-            println("(kill set) Found a store instruction");
+            println("(kill set) Found a store instruction to add to set S");
 #endif
             vec_push(storeSet, inst);
         }
     }
+
+    // loop through again, for each instruction I, check if it kills an
+    // instruction in S and add that instruction to the kill set
+    // This method works because all of the instructions are added in
+    // order, so if we are looking at a store instruction, and it has a
+    // match in the list, every instruction that comes after the current
+    // one also follows it in the basic block, so it cannot be killed by
+    // the current instruction, hence there is no point looking at any
+    // of those instructions.
+    for (LLVMValueRef inst = LLVMGetFirstInstruction(bb); inst;
+         inst = LLVMGetNextInstruction(inst)) {
+        // only need to look at instructions that store constants, otherwise
+        // skip to next instruction
+        // TODO: figure out if I'm checking the correct operand
+        if (!(LLVMIsAStoreInst(inst) &&
+              LLVMIsAConstant(LLVMGetOperand(inst, 1))))
+            continue;
+
+#ifdef DEBUG
+        println("(kill set) found constant store instruction");
+#endif
+
+        LLVMValueRef currLoc = LLVMGetOperand(inst, 1);
+
+        int i;            // loop index iterator
+        LLVMValueRef val; // loop value iterator
+        vec_foreach(storeSet, val, i) {
+            LLVMValueRef listLoc = LLVMGetOperand(val, 1);
+
+            // Break once we get to the current instruction because an
+            // instruction can't kill itself or other store instructions
+            // that come after it. If there is a match on the location,
+            // we know that the current instruction kills this previous
+            // instruction
+            if (inst == val)
+                break;
+            else if (currLoc == listLoc) {
+                vec_push(killSet, val);
+#ifdef DEBUG
+                println("(kill set) constant store instruction kills previous "
+                        "instruction");
+#endif
+            }
+        }
+    }
+    // free storeset because it's not used outside the function
     vec_deinit(storeSet);
     free(storeSet);
     return killSet;

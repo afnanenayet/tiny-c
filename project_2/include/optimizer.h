@@ -21,4 +21,4 @@
  *
  * \param m The module to optimize
  */
-void optimize_program(LLVMModuleRef m);
+void optimizeProgram(LLVMModuleRef m);

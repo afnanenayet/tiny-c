@@ -10,8 +10,10 @@
  * In this file, we implement constant propagation and constant folding.
  */
 #include <llvm-c/Core.h>
+#include <stdbool.h>
 
 #include "optimizer.h"
+#include "llvm_utils.h"
 
 /*** Private function prototypes ***/
 
@@ -25,9 +27,6 @@ void optim_constant_propagation(void);
  */
 void optim_constant_folding(void);
 
-/**
- * \brief Compute the "gen" set for a basic block
- */
 
 // TODO
 
@@ -39,4 +38,6 @@ void optim_constant_folding(void);
 
 // TODO
 
-void optimize_program(LLVMModuleRef m);
+void optimizeProgram(LLVMModuleRef m) {
+    bool success = walkFunctions(m);
+}

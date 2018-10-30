@@ -14,6 +14,7 @@
 
 #include "llvm_utils.h"
 #include "print_utils.h"
+#include "vec.h"
 
 LLVMModuleRef createLLVMModel(char *fp) {
     char *err = 0;
@@ -41,6 +42,8 @@ bool walkBasicblocks(LLVMValueRef function) {
     for (LLVMBasicBlockRef basicBlock = LLVMGetFirstBasicBlock(function);
          basicBlock; basicBlock = LLVMGetNextBasicBlock(basicBlock)) {
         // TODO run optimization routine here
+        val_vec_t *genSet = computeGenSet(basicBlock);
+        // vec_deinit(genSet); // TODO remove
     }
     return changed;
 }
@@ -55,4 +58,40 @@ bool walkFunctions(LLVMModuleRef module) {
         changed = changed || walkBasicblocks(function);
     }
     return changed;
+}
+
+val_vec_t *computeGenSet(LLVMBasicBlockRef bb) {
+    // initialize the empty set
+    val_vec_t *bbSet;
+    vec_init(bbSet);
+
+    // iterate over the instructions in the basic block
+    for (LLVMValueRef inst = LLVMGetFirstInstruction(bb); inst;
+         inst = LLVMGetNextInstruction(inst)) {
+        // if the instruction is a store instruction, store it in the set
+        if (LLVMIsAStoreInst(inst)) {
+#ifdef DEBUG
+            println("found store instruction");
+#endif
+            vec_push(bbSet, inst);
+        }
+        // get memory location of the store instruction
+        LLVMValueRef newStoreLoc = LLVMGetOperand(inst, 1);
+
+        // check to see if any of the instructions already stored in the
+        // vector reference the same location, if so, remove them
+        int i;
+        LLVMValueRef val;
+        vec_foreach(bbSet, val, i) {
+            LLVMValueRef oldStoreLoc = LLVMGetOperand(inst, 1);
+
+            if (oldStoreLoc == newStoreLoc) {
+#ifdef DEBUG
+                println("redundant location");
+#endif
+                vec_remove(bbSet, val);
+            }
+        }
+    }
+    return bbSet;
 }

@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include "llvm_utils.h"
+#include "optimizer.h"
 #include "print_utils.h"
 
 /**
@@ -35,5 +36,7 @@ int main(int argc, char *argv[]) {
         fprintln(stderr, "Invalid filepath or file received");
         return 1;
     }
+
+    optimizeProgram(m);
     return 0;
 }

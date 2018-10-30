@@ -61,7 +61,7 @@ bool walkBasicblocks(LLVMValueRef function);
  * \param[in] bb The basic block to inspect
  * \returns A newly allocated vector representing a set of LLVM values
  */
-llvm_vec_t *computeGenSet(LLVMValueRef bb);
+val_vec_t *computeGenSet(LLVMBasicBlockRef bb);
 
 /**
  * \brief Compute the "kill" set for a basic block
@@ -75,4 +75,4 @@ llvm_vec_t *computeGenSet(LLVMValueRef bb);
  * \param[in] bb The basic block to inspect
  * \returns A newly allocated vector representing a set of LLVM values
  */
-llvm_vec_t *computeKillSet(LLVMValueRef bb);
+val_vec_t *computeKillSet(LLVMBasicBlockRef bb);

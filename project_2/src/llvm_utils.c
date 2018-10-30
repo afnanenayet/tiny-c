@@ -104,10 +104,13 @@ val_vec_t *computeGenSet(LLVMBasicBlockRef bb) {
 val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
     val_vec_t *killSet = malloc(sizeof(val_vec_t));
     vec_init(killSet);
-    val_vec_t *storeSet = malloc(sizeof(val_vec_t));
+
+    // Don't need to malloc storeset because it's not used outside of the
+    // function
+    val_vec_t storeSet;
 
     /// set $S$
-    vec_init(storeSet);
+    vec_init(&storeSet);
 
     // compute some set S of all the constant store instructions in some
     // given function
@@ -117,7 +120,7 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
 #ifdef DEBUG
             println("(kill set) Found a store instruction to add to set S");
 #endif
-            vec_push(storeSet, inst);
+            vec_push(&storeSet, inst);
         }
     }
 
@@ -146,7 +149,7 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
 
         int i;            // loop index iterator
         LLVMValueRef val; // loop value iterator
-        vec_foreach(storeSet, val, i) {
+        vec_foreach(&storeSet, val, i) {
             LLVMValueRef listLoc = LLVMGetOperand(val, 1);
 
             // Break once we get to the current instruction because an
@@ -165,8 +168,6 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
             }
         }
     }
-    // free storeset because it's not used outside the function
-    vec_deinit(storeSet);
-    free(storeSet);
+    vec_deinit(&storeSet);
     return killSet;
 }

@@ -9,24 +9,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(C_STANDARD C11)
 set(program_name optimizer)
 
+# change value to ON if you want to generate doxygen documentation
+option(enable_docs "Generate documentation with Doxygen" OFF)
+
 # enable all warnings
-# set(CMAKE_C_FLAGS
-#     "${CMAKE_C_FLAGS} -Wall -Wpedantic -std=c11"
-#     )
- set (CMAKE_C_FLAGS_DEBUG
-     "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG"
-     )
+set(CMAKE_C_FLAGS
+    "${CMAKE_C_FLAGS} -Wall -Wpedantic"
+    )
+set (CMAKE_C_FLAGS_DEBUG
+    "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -Wpedantic"
+    )
 # set (CMAKE_LINKER_FLAGS_DEBUG
 #     "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
 #     )
 
+
 # optional doxygen package to generate docs
-find_package(Doxygen)
-doxygen_add_docs(
-    docs
-    ${PROJECT_SOURCE_DIR}
-    COMMENT "Generate documentation"
-    )
+if(enable_docs)
+    find_package(Doxygen)
+    doxygen_add_docs(
+        docs
+        ${PROJECT_SOURCE_DIR}
+        COMMENT "Generate documentation"
+        )
+endif(enable_docs)
 
 # add LLVM libraries
 find_package(LLVM REQUIRED CONFIG)
@@ -50,4 +56,3 @@ target_link_libraries(${program_name}
     ${core}
     ${irreader}
     )
-

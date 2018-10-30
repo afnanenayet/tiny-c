@@ -9,6 +9,8 @@
 #include <llvm-c/Core.h>
 #include <stdbool.h>
 
+#include <vec.h>
+
 #pragma once
 
 /**
@@ -46,3 +48,31 @@ bool walkFunctions(LLVMModuleRef module);
  * optimization routine.
  */
 bool walkBasicblocks(LLVMValueRef function);
+
+/**
+ * \brief Compute the "gen" set for a basic block
+ *
+ * Given some LLVM basic block, this function computes the "gen" set for the
+ * basic block with respect to the rest of the basic blocks.
+ *
+ * Note that this function initializes a new vector that must be deleted
+ * later.
+ *
+ * \param[in] bb The basic block to inspect
+ * \returns A newly allocated vector representing a set of LLVM values
+ */
+llvm_vec_t *computeGenSet(LLVMValueRef bb);
+
+/**
+ * \brief Compute the "kill" set for a basic block
+ *
+ * Given some LLVM basic block, this function computes the "kill" set for the
+ * basic block with respect to the rest of the basic blocks.
+ *
+ * Note that this function initializes a new vector that must be deleted
+ * later.
+ *
+ * \param[in] bb The basic block to inspect
+ * \returns A newly allocated vector representing a set of LLVM values
+ */
+llvm_vec_t *computeKillSet(LLVMValueRef bb);

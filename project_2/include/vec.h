@@ -5,11 +5,11 @@
  * under the terms of the MIT license. See LICENSE for details.
  */
 
-#ifndef VEC_H
-#define VEC_H
+#pragma once
 
 #include <stdlib.h>
 #include <string.h>
+#include <llvm-c/Core.h>
 
 #define VEC_VERSION "0.2.1"
 
@@ -138,4 +138,5 @@ typedef vec_t(char) vec_char_t;
 typedef vec_t(float) vec_float_t;
 typedef vec_t(double) vec_double_t;
 
-#endif
+// additional vector types
+typedef vec_t(LLVMValueRef) llvm_vec_t;

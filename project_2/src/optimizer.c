@@ -25,6 +25,10 @@ void optim_constant_propagation(void);
  */
 void optim_constant_folding(void);
 
+/**
+ * \brief Compute the "gen" set for a basic block
+ */
+
 // TODO
 
 /*** Private function definitions ***/

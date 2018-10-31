@@ -173,5 +173,143 @@ val_vec_t *computeS(LLVMValueRef fn) {
     return S;
 }
 
-meta_vec_t *computeBlockMData(LLVMValueRef fn) {
+meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
+    meta_vec_t *vec = malloc(sizeof(meta_vec_t));
+    vec_init(vec);
+
+    // a buffer for the running block of predecessors (the "in" set)
+    val_vec_t preds;
+    vec_init(&preds);
+
+    // whether any change was applied
+    bool changed = false;
+
+    // initialize the metadata vector with each input set as the null set,
+    // the output set as equal to GEN[B], and compute gen/kill for each of the
+    // blocks
+    for (LLVMBasicBlockRef basicBlock = LLVMGetFirstBasicBlock(fn); basicBlock;
+         basicBlock = LLVMGetNextBasicBlock(basicBlock)) {
+        meta_t *metadata = malloc(sizeof(meta_t));
+        metadata->bb = basicBlock;
+
+        // set gen/kill sets for the bb
+        metadata->genSet = computeGenSet(basicBlock);
+        metadata->killSet = computeKillSet(basicBlock, S);
+
+        val_vec_t *inSet = malloc(sizeof(val_vec_t));
+        vec_init(inSet);
+        metadata->inSet = inSet;
+
+        val_vec_t *outSet = malloc(sizeof(val_vec_t));
+        vec_init(outSet);
+
+        LLVMValueRef bbIterator;
+        int idx;
+
+        // copy gen to out
+        vec_foreach(metadata->genSet, bbIterator, idx) {
+            vec_push(outSet, bbIterator);
+        }
+        metadata->outSet = outSet;
+        vec_push(vec, metadata);
+    }
+
+    // keep applying these changes until we reach a fixed point
+    do {
+        int idx0;
+        meta_t *currMeta;
+
+        // reset the predecessors vector
+        vec_deinit(&preds);
+        vec_init(&preds);
+
+        // iterate through each basic block
+        vec_foreach(vec, currMeta, idx0) {
+            // in is the union of OUT from predecessors
+            // loop through predecessors and add union of all preds to IN of
+            // current bb
+            int idx1;
+            LLVMValueRef pred;
+
+            vec_foreach(&preds, pred, idx1) {
+                int found_idx = -1;
+
+                // add to the predecessors if instruction isn't already there
+                vec_find(currMeta->inSet, pred, found_idx);
+
+                if (found_idx == -1)
+                    vec_push(currMeta->inSet, pred);
+            }
+
+            // $ OUT[B] = GEN[B] \cup (IN[B] - KILL[B])
+            // retain old out set for comparison
+            // TODO de-allocate this
+            val_vec_t *oldOut = currMeta->outSet;
+
+            // IN[B] - KILL[B]
+            val_vec_t *b = malloc(sizeof(val_vec_t));
+            vec_init(b);
+
+            int idx2;
+            LLVMValueRef temp;
+
+            // copy IN[B] to vector `b`
+            vec_foreach(currMeta->inSet, temp, idx2) { vec_push(b, temp); }
+
+            // copy KILL[B] to vector b if it's not in B
+            // if it is in b, remove the element from b
+            vec_foreach(currMeta->killSet, temp, idx2) {
+                int found = -1;
+                vec_find(b, temp, found);
+
+                if (found == -1) {
+                    vec_push(b, temp);
+                } else {
+                    vec_remove(b, temp);
+                }
+            }
+
+            // set union between `b` and GEN[B]
+            vec_foreach(currMeta->genSet, temp, idx2) {
+                int found = -1;
+                vec_find(b, temp, found);
+
+                if (found == -1)
+                    vec_push(b, temp);
+            }
+            currMeta->outSet = b;
+
+            // compare the new OUT[B] and the old OUT[B] to see if there
+            // were any changes this iteration
+            vec_foreach(currMeta->outSet, temp, idx2) {
+                int found = -1;
+                vec_find(oldOut, temp, found);
+
+                if (found == -1)
+                    changed = true;
+            }
+
+            // need to compare both ways because a set equality requires us
+            // to test whether A is a subset of B and B is a subset of A
+            vec_foreach(oldOut, temp, idx2) {
+                int found = -1;
+                vec_find(currMeta->outSet, temp, found);
+
+                if (found == -1)
+                    changed = true;
+            }
+            vec_deinit(oldOut);
+            free(oldOut);
+
+            // add OUT[B] to the predecessors (union set op)
+            vec_foreach(currMeta->outSet, temp, idx2) {
+                int found = -1;
+                vec_find(&preds, temp, found);
+
+                if (found == -1)
+                    vec_push(&preds, temp);
+            }
+        }
+    } while (changed);
+    return vec;
 }

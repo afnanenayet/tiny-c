@@ -41,7 +41,7 @@ typedef struct meta_s {
 } meta_t;
 
 /// A vector of basic blocks and associated metadata
-typedef vec_t(meta_t) meta_vec_t;
+typedef vec_t(meta_t *) meta_vec_t;
 
 /*** public function prototypes ***/
 
@@ -137,6 +137,8 @@ val_vec_t *computeS(LLVMValueRef fn);
  * the basic block each set corresponds to.
  *
  * \param[in] fn A LLVM function containing basic blocks
+ * \param[in] S a set of all of the constant store instructions in the
+ * function
  * \returns A vector of metadata structs
  */
-meta_vec_t *computeBlockMData(LLVMValueRef fn);
+meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S);

@@ -178,6 +178,7 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
     vec_init(vec);
 
     // a buffer for the running block of predecessors (the "in" set)
+    // TODO delete, figure out how to PROPERLY generate a preds array for each basic block
     val_vec_t preds;
     vec_init(&preds);
 
@@ -219,28 +220,13 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
         int idx0;
         meta_t *currMeta;
 
+        // TODO compute predecessors properly
         // reset the predecessors vector
         vec_deinit(&preds);
         vec_init(&preds);
 
         // iterate through each basic block
         vec_foreach(vec, currMeta, idx0) {
-            // in is the union of OUT from predecessors
-            // loop through predecessors and add union of all preds to IN of
-            // current bb
-            int idx1;
-            LLVMValueRef pred;
-
-            vec_foreach(&preds, pred, idx1) {
-                int found_idx = -1;
-
-                // add to the predecessors if instruction isn't already there
-                vec_find(currMeta->inSet, pred, found_idx);
-
-                if (found_idx == -1)
-                    vec_push(currMeta->inSet, pred);
-            }
-
             // $ OUT[B] = GEN[B] \cup (IN[B] - KILL[B])
             // retain old out set for comparison
             // TODO de-allocate this

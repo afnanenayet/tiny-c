@@ -38,6 +38,9 @@ typedef struct meta_s {
 
     /// The out or `out[B]`
     val_vec_t *outSet;
+
+    /// The predecessors to the basic block
+    val_vec_t *preds;
 } meta_t;
 
 /// A vector of basic blocks and associated metadata

@@ -13,6 +13,38 @@
 
 #pragma once
 
+/*** type definitions ***/
+
+/// A vector of LLVM values
+typedef vec_t(LLVMValueRef) val_vec_t;
+
+/*** struct definitions ***/
+
+/// A struct containing a basic block and optimization metadata associated
+/// with basic block
+typedef struct meta_s {
+    /// The basic block that the sets correspond to. This will be referred to
+    /// as $B$
+    LLVMBasicBlockRef bb;
+
+    /// The gen set, or `gen[B]`
+    val_vec_t *genSet;
+
+    /// The kill set, or `kill[B]`
+    val_vec_t *killSet;
+
+    /// The in set, or `in[B]`
+    val_vec_t *inSet;
+
+    /// The out or `out[B]`
+    val_vec_t *outSet;
+} meta_t;
+
+/// A vector of basic blocks and associated metadata
+typedef vec_t(meta_t) meta_vec_t;
+
+/*** public function prototypes ***/
+
 /**
  * \brief Create an LLVM model from an LLVM IR file
  *
@@ -89,3 +121,22 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb, val_vec_t *S);
  * \returns A vector representing the set $S$
  */
 val_vec_t *computeS(LLVMValueRef fn);
+
+/**
+ * \brief Given some function, compute the optimization metadata for each basic
+ * block
+ *
+ * For a function, this method iterates through every basic block and computes
+ * the following sets:
+ *   - gen
+ *   - kill
+ *   - in
+ *   - out
+ *
+ * The method creates a vector of metadata structs that contain a reference to
+ * the basic block each set corresponds to.
+ *
+ * \param[in] fn A LLVM function containing basic blocks
+ * \returns A vector of metadata structs
+ */
+meta_vec_t *computeBlockMData(LLVMValueRef fn);

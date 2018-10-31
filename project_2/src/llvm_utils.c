@@ -172,3 +172,6 @@ val_vec_t *computeS(LLVMValueRef fn) {
     }
     return S;
 }
+
+meta_vec_t *computeBlockMData(LLVMValueRef fn) {
+}

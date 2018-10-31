@@ -137,7 +137,3 @@ typedef vec_t(int) vec_int_t;
 typedef vec_t(char) vec_char_t;
 typedef vec_t(float) vec_float_t;
 typedef vec_t(double) vec_double_t;
-
-// additional vector types
-typedef vec_t(LLVMValueRef) val_vec_t;
-typedef vec_t(LLVMBasicBlockRef) bb_vec_t;

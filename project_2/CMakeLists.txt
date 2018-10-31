@@ -10,7 +10,7 @@ set(C_STANDARD C11)
 set(program_name optimizer)
 
 # change value to ON if you want to generate doxygen documentation
-option(enable_docs "Generate documentation with Doxygen" OFF)
+option(enable_docs "Generate documentation with Doxygen" ON)
 
 # enable all warnings
 set(CMAKE_C_FLAGS

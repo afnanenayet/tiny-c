@@ -23,9 +23,10 @@
  * \brief Perform constant propagation on a module
  *
  * \param[in] fn The function to optimize
+ * \param[in] basicBlocks The metadata and basic blocks in the function
  * \returns Whether any optimization was performed
  */
-static bool constProp(LLVMValueRef fn);
+static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks);
 
 /**
  * \brief Perform constant folding on a basic block
@@ -93,7 +94,76 @@ static bool constFold(LLVMBasicBlockRef bb) {
     return changed;
 }
 
-static bool constProp(LLVMValueRef fn) {}
+static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
+    bool changed = false;
+
+    // loop through each basic block, then each instruction in each basic
+    // block
+    int i;
+    meta_t *meta;
+    val_vec_t R;
+    vec_init(&R);
+
+    // deletion queue
+    val_vec_t toDelete;
+    vec_init(&toDelete);
+
+    vec_foreach(basicBlocks, meta, i) {
+        vec_deinit(&R);
+        vec_init(&R);
+
+        // copy IN[B] to R
+        LLVMValueRef temp;
+        int j;
+        vec_foreach(meta->inSet, temp, j) { vec_push(&R, temp); }
+
+        // loop through each instruction in the basic block
+        LLVMBasicBlockRef basicBlock = meta->bb;
+
+        for (LLVMValueRef inst = LLVMGetFirstInstruction(basicBlock); inst;
+             inst = LLVMGetNextInstruction(inst)) {
+            // if I is a constant store instruction, add it to R
+            if (LLVMIsAStoreInst(inst) &&
+                LLVMIsAConstant(LLVMGetOperand(inst, 1))) {
+                vec_push(&R, inst);
+            } else if (LLVMIsAStoreInst(inst)) {
+                // if I is a store instruction, remove everything in R that is
+                // killed by the instruction I
+                LLVMValueRef tempInst;
+                LLVMValueRef addr =
+                    LLVMGetOperand(inst, 0); // TODO check and make sure this is
+                                             // the right way to get an address
+                vec_foreach(&R, tempInst, j) {
+                    // TODO make sure I'm getting the right address
+                    LLVMValueRef otherAddr = LLVMGetOperand(tempInst, 0);
+
+                    if (otherAddr == addr)
+                        vec_remove(&R, tempInst);
+                }
+            } else if (LLVMIsALoadInst(inst)) {
+                // If I is a load instruction that loads from the address
+                // represented by the variable %t, then find all the store
+                // instructions in R that write to addresses represented by %t
+                // if they all write the same constant into memory, then replace
+                // all of the uses of instruction I by the constant in the store
+                // isntructions mark the load instructions for deletion, then
+                // delete them later
+            }
+        }
+    }
+
+    // delete all the instructions marked for deletion in the queue
+    LLVMValueRef deleteInst;
+    vec_foreach(&toDelete, deleteInst, i) {
+        LLVMInstructionEraseFromParent(deleteInst);
+    }
+    // if anything was deleted, then changes have been made
+    // otherwise, we hvae reached a fixed point
+    changed = toDelete.length > 0;
+    vec_deinit(&toDelete);
+    vec_deinit(&R);
+    return changed;
+}
 
 /*** Public function definitions ***/
 

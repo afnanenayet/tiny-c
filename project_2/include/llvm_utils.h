@@ -145,3 +145,14 @@ val_vec_t *computeS(LLVMValueRef fn);
  * \returns A vector of metadata structs
  */
 meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S);
+
+/**
+ * \brief Find the predecessors for a given basic block
+ *
+ * Given some basic block, this method will compute the precedessors of the
+ * basic block in the control flow graph.
+ *
+ * \param[in] bb The basic block to inspect
+ * \returns A new vector with the precedessors of the basic block
+ */
+val_vec_t *computePreds(LLVMBasicBlockRef bb);

@@ -261,7 +261,7 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
             vec_deinit(&b);
 
             changed =
-                setEqual((vec_void_t *)oldOut, (vec_void_t *)currMeta->outSet);
+                !setEqual((vec_void_t *)oldOut, (vec_void_t *)currMeta->outSet);
             vec_deinit(oldOut);
             free(oldOut);
 

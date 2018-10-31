@@ -22,10 +22,10 @@
 /**
  * \brief Perform constant propagation on a module
  *
- * \param[in] bb The basic block to optimize
+ * \param[in] fn The function to optimize
  * \returns Whether any optimization was performed
  */
-static bool constProp(LLVMBasicBlockRef bb);
+static bool constProp(LLVMValueRef fn);
 
 /**
  * \brief Perform constant folding on a basic block
@@ -92,6 +92,8 @@ static bool constFold(LLVMBasicBlockRef bb) {
     vec_deinit(&toDelete);
     return changed;
 }
+
+static bool constProp(LLVMValueRef fn) {}
 
 /*** Public function definitions ***/
 

@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "set_utils.h"
 #include "vec.h"
 
@@ -33,4 +35,26 @@ vec_void_t *setDedup(vec_void_t *a) {
             vec_push(newSet, it);
     }
     return newSet;
+}
+
+bool setEqual(vec_void_t *a, vec_void_t *b) {
+    bool equal = true;
+    void *it;
+    int i;
+    int found = -1;
+
+    vec_foreach(a, it, i) {
+        vec_find(b, it, found);
+
+        if (found == -1)
+            equal = false;
+    }
+
+    vec_foreach(b, it, i) {
+        vec_find(a, it, found);
+
+        if (found == -1)
+            equal = false;
+    }
+    return equal;
 }

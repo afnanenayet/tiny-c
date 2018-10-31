@@ -28,8 +28,8 @@
  * Both vectors that are passed in should have the same type, or at least have
  * elements that are comparable using the equality operator.
  *
- * \param a A vector/set
- * \param b A vector/set
+ * \param[in] a A vector/set
+ * \param[in] b A vector/set
  * \returns A new vector with the union of the elements between `a` and `b`
  */
 vec_void_t *setUnion(vec_void_t *a, vec_void_t *b);
@@ -42,7 +42,24 @@ vec_void_t *setUnion(vec_void_t *a, vec_void_t *b);
  * This can be thought of a set constructor that takes an existing vector,
  * much like Python's `set(obj)` method.
  *
- * \param a A vector
+ * \param[in] a A vector
  * \returns A new vector with the deduplicated elements of vector `a`
  */
 vec_void_t *setDedup(vec_void_t *a);
+
+/**
+ * \brief Return whether two sets are equal
+ *
+ * Given two vectors, compare the two and return whether the contain the same
+ * elements. This function is independent of the order of the vectors, and it
+ * will not take duplicated elements into account.
+ *
+ * This function checks for equality by checking whether a is a subset of b,
+ * and whether b is a subset of a. If both conditions are true, then a and b
+ * must be equal.
+ *
+ * \param[in] a A vector
+ * \param[in] b A vector
+ * \returns Whether the vectors have set equality
+ */
+bool setEqual(vec_void_t *a, vec_void_t *b);

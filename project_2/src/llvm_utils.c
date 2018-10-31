@@ -15,6 +15,7 @@
 
 #include "llvm_utils.h"
 #include "print_utils.h"
+#include "set_utils.h"
 #include "vec.h"
 
 LLVMModuleRef createLLVMModel(char *fp) {
@@ -178,7 +179,8 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
     vec_init(vec);
 
     // a buffer for the running block of predecessors (the "in" set)
-    // TODO delete, figure out how to PROPERLY generate a preds array for each basic block
+    // TODO delete, figure out how to PROPERLY generate a preds array for each
+    // basic block
     val_vec_t preds;
     vec_init(&preds);
 
@@ -229,61 +231,37 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
         vec_foreach(vec, currMeta, idx0) {
             // $ OUT[B] = GEN[B] \cup (IN[B] - KILL[B])
             // retain old out set for comparison
-            // TODO de-allocate this
             val_vec_t *oldOut = currMeta->outSet;
 
             // IN[B] - KILL[B]
-            val_vec_t *b = malloc(sizeof(val_vec_t));
-            vec_init(b);
+            val_vec_t b;
+            vec_init(&b);
 
             int idx2;
             LLVMValueRef temp;
 
             // copy IN[B] to vector `b`
-            vec_foreach(currMeta->inSet, temp, idx2) { vec_push(b, temp); }
+            vec_foreach(currMeta->inSet, temp, idx2) { vec_push(&b, temp); }
 
-            // copy KILL[B] to vector b if it's not in B
-            // if it is in b, remove the element from b
+            // remove any elements that that are in IN[B] that are also in
+            // KILL[B]
             vec_foreach(currMeta->killSet, temp, idx2) {
                 int found = -1;
-                vec_find(b, temp, found);
+                vec_find(&b, temp, found);
 
-                if (found == -1) {
-                    vec_push(b, temp);
-                } else {
-                    vec_remove(b, temp);
+                if (found != -1) {
+                    vec_remove(&b, temp);
                 }
             }
 
             // set union between `b` and GEN[B]
-            vec_foreach(currMeta->genSet, temp, idx2) {
-                int found = -1;
-                vec_find(b, temp, found);
+            currMeta->outSet = (val_vec_t *)setUnion(
+                (vec_void_t *)currMeta->genSet, (vec_void_t *)&b);
 
-                if (found == -1)
-                    vec_push(b, temp);
-            }
-            currMeta->outSet = b;
+            vec_deinit(&b);
 
-            // compare the new OUT[B] and the old OUT[B] to see if there
-            // were any changes this iteration
-            vec_foreach(currMeta->outSet, temp, idx2) {
-                int found = -1;
-                vec_find(oldOut, temp, found);
-
-                if (found == -1)
-                    changed = true;
-            }
-
-            // need to compare both ways because a set equality requires us
-            // to test whether A is a subset of B and B is a subset of A
-            vec_foreach(oldOut, temp, idx2) {
-                int found = -1;
-                vec_find(currMeta->outSet, temp, found);
-
-                if (found == -1)
-                    changed = true;
-            }
+            changed =
+                setEqual((vec_void_t *)oldOut, (vec_void_t *)currMeta->outSet);
             vec_deinit(oldOut);
             free(oldOut);
 

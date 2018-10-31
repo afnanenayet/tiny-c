@@ -73,6 +73,19 @@ val_vec_t *computeGenSet(LLVMBasicBlockRef bb);
  * later.
  *
  * \param[in] bb The basic block to inspect
+ * \param[in] S A set of all of the
  * \returns A newly allocated vector representing a set of LLVM values
  */
-val_vec_t *computeKillSet(LLVMBasicBlockRef bb);
+val_vec_t *computeKillSet(LLVMBasicBlockRef bb, val_vec_t *S);
+
+/**
+ * \brief Compute the set $S$
+ *
+ * Compute the set $S$ for a function. The set $S$ is defined as all
+ * of the instructions in some function that are store instructions that
+ * store constant values.
+ *
+ * \param[in] fn The function to inspect
+ * \returns A vector representing the set $S$
+ */
+val_vec_t *computeS(LLVMValueRef fn);

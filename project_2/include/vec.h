@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include <llvm-c/Core.h>
 #include <stdlib.h>
 #include <string.h>
-#include <llvm-c/Core.h>
 
 #define VEC_VERSION "0.2.1"
 
@@ -27,8 +27,8 @@
 #define vec_deinit(v) (free((v)->data), vec_init(v))
 
 #define vec_push(v, val)                                                       \
-    (vec_expand_(vec_unpack_(v)) ? -1 : ((v)->data[(v)->length++] = (val), 0), \
-     0)
+    (vec_expand_(vec_unpack_(v)) ? -1 : ((v)->data[(v)->length++] = (val), 0))
+/*,  0)*/
 
 #define vec_pop(v) (v)->data[--(v)->length]
 

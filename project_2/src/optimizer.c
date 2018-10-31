@@ -95,6 +95,4 @@ static bool constFold(LLVMBasicBlockRef bb) {
 
 /*** Public function definitions ***/
 
-// TODO
-
 void optimizeProgram(LLVMModuleRef m) { bool success = walkFunctions(m); }

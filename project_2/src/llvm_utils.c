@@ -101,28 +101,9 @@ val_vec_t *computeGenSet(LLVMBasicBlockRef bb) {
     return genSet;
 }
 
-val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
+val_vec_t *computeKillSet(LLVMBasicBlockRef bb, val_vec_t *S) {
     val_vec_t *killSet = malloc(sizeof(val_vec_t));
     vec_init(killSet);
-
-    // Don't need to malloc storeset because it's not used outside of the
-    // function
-    val_vec_t storeSet;
-
-    /// set $S$
-    vec_init(&storeSet);
-
-    // compute some set S of all the constant store instructions in some
-    // given function
-    for (LLVMValueRef inst = LLVMGetFirstInstruction(bb); inst;
-         inst = LLVMGetNextInstruction(inst)) {
-        if (LLVMIsAStoreInst(inst)) {
-#ifdef DEBUG
-            println("(kill set) Found a store instruction to add to set S");
-#endif
-            vec_push(&storeSet, inst);
-        }
-    }
 
     // loop through again, for each instruction I, check if it kills an
     // instruction in S and add that instruction to the kill set
@@ -149,7 +130,7 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
 
         int i;            // loop index iterator
         LLVMValueRef val; // loop value iterator
-        vec_foreach(&storeSet, val, i) {
+        vec_foreach(S, val, i) {
             LLVMValueRef listLoc = LLVMGetOperand(val, 1);
 
             // Break once we get to the current instruction because an
@@ -168,6 +149,26 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb) {
             }
         }
     }
-    vec_deinit(&storeSet);
+    vec_deinit(S);
     return killSet;
+}
+
+val_vec_t *computeS(LLVMValueRef fn) {
+    val_vec_t *S = malloc(sizeof(val_vec_t));
+    vec_init(S);
+
+    // loop through all of the basic blocks in the function, and loop
+    // through each instruction in the basic blocks, adding appropriate
+    // instructions to the set
+    for (LLVMBasicBlockRef basicBlock = LLVMGetFirstBasicBlock(fn); basicBlock;
+         basicBlock = LLVMGetNextBasicBlock(basicBlock)) {
+        for (LLVMValueRef inst = LLVMGetFirstInstruction(basicBlock); inst;
+             inst = LLVMGetNextInstruction(inst)) {
+            if (LLVMIsAStoreInst(inst) &&
+                LLVMIsAConstant(LLVMGetOperand(inst, 1))) {
+                vec_push(S, inst);
+            }
+        }
+    }
+    return S;
 }

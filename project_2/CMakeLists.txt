@@ -13,17 +13,29 @@ set(program_name optimizer)
 option(enable_docs "Generate documentation with Doxygen" ON)
 option(clang_tidy "Enable clang-tidy target" ON)
 
+option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
+if (${FORCE_COLORED_OUTPUT})
+    if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+       add_compile_options (-fdiagnostics-color=always)
+    elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+       add_compile_options (-fcolor-diagnostics)
+    endif ()
+endif ()
+
 # enable all warnings
 set(CMAKE_C_FLAGS
     "${CMAKE_C_FLAGS} -Wall -Wpedantic"
     )
 set (CMAKE_C_FLAGS_DEBUG
-    "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -Wpedantic"
+    # "${CMAKE_C_FLAGS_DEBUG} -DDEBUG -Wall -Wpedantic -fsanitize=address -fno-omit-frame-pointer"
+    "${CMAKE_C_FLAGS_DEBUG} -Wall -Wpedantic -DDEBUG"
     )
 # set (CMAKE_LINKER_FLAGS_DEBUG
-#     "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
-#     )
-
+#    "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
+#    )
+#set (CMAKE_STATIC_LINKER_FLAGS_DEBUG
+#    "${CMAKE_STATIC_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
+#    )
 
 # optional doxygen package to generate docs
 if(enable_docs)

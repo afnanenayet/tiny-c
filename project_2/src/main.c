@@ -40,5 +40,7 @@ int main(int argc, char *argv[]) {
 
     // print LLVM program to stdout
     LLVMDumpModule(m);
+
+    // deallocate the data structures that were initialized for optimization
     return 0;
 }

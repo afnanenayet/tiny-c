@@ -179,3 +179,13 @@ void computePreds(meta_vec_t *vec);
  * the basic block.
  */
 meta_t *vec_find_bb(meta_vec_t *vec, LLVMBasicBlockRef bb);
+
+/**
+ * \brief Delete a metadata vector and all data inside
+ *
+ * Given some metadata vector, this will delete all of the vectors inside the
+ * metadata vector.
+ *
+ * \param[in] vec The vector to delete
+ */
+void meta_vec_delete(meta_vec_t *vec);

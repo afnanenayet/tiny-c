@@ -222,8 +222,14 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
     }
     computePreds(vec);
 
+    // A debugging counter to keep track of how many in/out iterations the
+    // function goes through before reaching a fixed point
+    unsigned inOutCounter = 0;
+
     // keep applying these changes until we reach a fixed point
     do {
+
+        inOutCounter++;
         int idx0;
         meta_t *currMeta;
 
@@ -236,6 +242,9 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
             vec_foreach(currMeta->preds, currPred, idx3) {
                 // the meta block that corresponds to the precedessor BB
                 meta_t *predMeta = vec_find_bb(vec, currPred);
+
+                // there is no reason that predMeta should be null. If it is,
+                // there are very large issues that need to be dealt with
                 assert(predMeta != NULL);
                 val_vec_t *oldInSet = currMeta->inSet;
                 currMeta->inSet = (val_vec_t *)setUnion(
@@ -281,6 +290,10 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
             free(oldOut);
         }
     } while (changed);
+#ifdef DEBUG
+    printf("(computeMBlockData) Reached fixed point after %d iterations\n",
+           inOutCounter);
+#endif
     return vec;
 }
 
@@ -312,7 +325,7 @@ void computePreds(meta_vec_t *vec) {
                 if (potentialSuccessor->bb == succ) {
                     vec_push(potentialSuccessor->preds, it->bb);
 #ifdef DEBUG
-                    println("(computePreds) Found successor");
+                    println("--> (computePreds) Found successor");
 #endif
                 }
             }
@@ -329,4 +342,26 @@ meta_t *vec_find_bb(meta_vec_t *vec, LLVMBasicBlockRef bb) {
             return it;
     }
     return NULL;
+}
+
+void meta_vec_delete(meta_vec_t *vec) {
+    // loop through each entry and delete all allocated data
+    meta_t *it;
+    int i = 0;
+
+    vec_foreach(vec, it, i) {
+        vec_deinit(it->genSet);
+        free(it->genSet);
+        vec_deinit(it->killSet);
+        free(it->killSet);
+        vec_deinit(it->inSet);
+        free(it->inSet);
+        vec_deinit(it->outSet);
+        free(it->outSet);
+        vec_deinit(it->preds);
+        free(it->preds);
+        free(it);
+    }
+    vec_deinit(vec);
+    free(vec);
 }

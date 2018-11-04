@@ -12,7 +12,9 @@
 #include <llvm-c/Core.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
+#include "print_utils.h"
 #include "llvm_utils.h"
 #include "optimizer.h"
 #include "vec.h"
@@ -174,4 +176,23 @@ void optimizeProgram(LLVMModuleRef m) {
     LLVMValueRef function = LLVMGetFirstFunction(m);
     val_vec_t *S = computeS(function);
     meta_vec_t *metadata = computeBlockMData(function, S);
+
+#ifdef DEBUG
+    printf("(optimizeProgram) %d basic blocks in metadata vector\n",
+           metadata->length);
+#endif
+
+    // deallocate the data structures that were initialized for optimization
+    meta_vec_delete(metadata);
+
+#ifdef DEBUG
+    println("(optimizeProgram) Deallocated metadata vector");
+#endif
+
+    vec_deinit(S);
+    free(S);
+
+#ifdef DEBUG
+    println("(optimizeProgram) Deallocated S vector");
+#endif
 }

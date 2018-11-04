@@ -11,12 +11,12 @@
  */
 #include <llvm-c/Core.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "print_utils.h"
 #include "llvm_utils.h"
 #include "optimizer.h"
+#include "print_utils.h"
 #include "vec.h"
 
 /*** Private function prototypes ***/
@@ -126,18 +126,15 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
              inst = LLVMGetNextInstruction(inst)) {
             // if I is a constant store instruction, add it to R
             if (LLVMIsAStoreInst(inst) &&
-                LLVMIsAConstant(LLVMGetOperand(inst, 1))) {
+                LLVMIsAConstant(LLVMGetOperand(inst, 0))) {
                 vec_push(&R, inst);
             } else if (LLVMIsAStoreInst(inst)) {
                 // if I is a store instruction, remove everything in R that is
                 // killed by the instruction I
                 LLVMValueRef tempInst;
-                LLVMValueRef addr =
-                    LLVMGetOperand(inst, 0); // TODO check and make sure this is
-                                             // the right way to get an address
+                LLVMValueRef addr = LLVMGetOperand(inst, 1);
                 vec_foreach(&R, tempInst, j) {
-                    // TODO make sure I'm getting the right address
-                    LLVMValueRef otherAddr = LLVMGetOperand(tempInst, 0);
+                    LLVMValueRef otherAddr = LLVMGetOperand(tempInst, 1);
 
                     if (otherAddr == addr)
                         vec_remove(&R, tempInst);
@@ -151,7 +148,56 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
                 // isntructions mark the load instructions for deletion, then
                 // delete them later
 
-                // TODO how do we find the address represented by `%t`
+                // Find all store instructions in R that write to address that
+                // the current instruction loads from, and figure out if all
+                // of the store instructions are constant store instructions
+                LLVMValueRef loadAddr = LLVMGetOperand(inst, 1);
+                LLVMValueRef it;
+                int j;
+
+                val_vec_t temp;
+                vec_init(&temp);
+
+                vec_foreach(&R, it, j) {
+                    if (LLVMIsAStoreInst(it) &&
+                        (LLVMGetOperand(it, 1) == loadAddr)) {
+                        vec_push(&temp, it);
+                    }
+                }
+
+                // bail if no optimizations can be made
+                if (R.length < 1) {
+                    vec_deinit(&temp);
+                    break;
+                }
+
+                // need to make sure all store ops are writing the same constant
+                // to memory
+                bool allConstStoreInsts = true;
+                LLVMValueRef constant = LLVMGetOperand(R.data[0], 0);
+
+                // check and see if everything in temp stores constants and
+                // write the same constant value
+                vec_foreach(&temp, it, j) {
+                    LLVMValueRef storedVal = LLVMGetOperand(it, 0);
+                    if (!(LLVMIsAStoreInst(it) && LLVMIsAConstant(storedVal) &&
+                          (storedVal == constant))) {
+                        allConstStoreInsts = false;
+                    }
+                }
+
+                // bail out if no optimizations can be made
+                if (!allConstStoreInsts) {
+                    vec_deinit(&temp);
+                    break;
+                }
+
+                // replace all uses of the current load instruction with a
+                // store instruction that stores a constant
+                LLVMReplaceAllUsesWith(inst, constant);
+                changed = true;
+                vec_deinit(&temp);
+                vec_push(&toDelete, inst);
             }
         }
     }
@@ -181,6 +227,27 @@ void optimizeProgram(LLVMModuleRef m) {
     printf("(optimizeProgram) %d basic blocks in metadata vector\n",
            metadata->length);
 #endif
+
+    bool changed = false;
+
+    // the number of passes the optimization routine takes
+    unsigned int optimizationPasses = 0;
+
+    // continue optimizing until the fixed-point
+    do {
+        optimizationPasses++;
+#ifdef DEBUG
+        printf("(optimizeProgram) Running optimization pass: %d\n",
+               optimizationPasses);
+#endif
+        changed = false;
+        changed |= constProp(function, metadata);
+
+        for (LLVMBasicBlockRef basicBlock = LLVMGetFirstBasicBlock(function);
+             basicBlock; basicBlock = LLVMGetNextBasicBlock(basicBlock)) {
+            changed |= constFold(basicBlock);
+        }
+    } while (changed);
 
     // deallocate the data structures that were initialized for optimization
     meta_vec_delete(metadata);

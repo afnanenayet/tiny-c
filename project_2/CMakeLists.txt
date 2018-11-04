@@ -10,8 +10,8 @@ set(C_STANDARD C11)
 set(program_name optimizer)
 
 # change value to ON if you want to generate doxygen documentation
-option(enable_docs "Generate documentation with Doxygen" ON)
-option(clang_tidy "Enable clang-tidy target" ON)
+option(enable_docs "Generate documentation with Doxygen" OFF)
+option(clang_tidy "Enable clang-tidy target" OFF)
 
 option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
 if (${FORCE_COLORED_OUTPUT})

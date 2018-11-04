@@ -37,5 +37,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     optimizeProgram(m);
+
+    // print LLVM program to stdout
+    LLVMDumpModule(m);
     return 0;
 }

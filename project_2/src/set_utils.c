@@ -58,3 +58,14 @@ bool setEqual(vec_void_t *a, vec_void_t *b) {
     }
     return equal;
 }
+
+vec_void_t *setCopy(vec_void_t *set) {
+    vec_void_t temp;
+    vec_init(&temp);
+
+    void *data;
+    int i;
+
+    vec_foreach(set, data, i) { vec_push(&temp, data); }
+    return setDedup(&temp);
+}

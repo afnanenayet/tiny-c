@@ -7,6 +7,7 @@
  * This module is a collection of functions meant to make it easier for the
  * user to interact with LLVM IR code, so it's easier to optimize.
  */
+#include <assert.h>
 #include <llvm-c/Core.h>
 #include <llvm-c/IRReader.h>
 #include <stdbool.h>
@@ -178,12 +179,6 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
     meta_vec_t *vec = malloc(sizeof(meta_vec_t));
     vec_init(vec);
 
-    // a buffer for the running block of predecessors (the "in" set)
-    // TODO delete, figure out how to PROPERLY generate a preds array for each
-    // basic block
-    val_vec_t preds;
-    vec_init(&preds);
-
     // whether any change was applied
     bool changed = false;
 
@@ -206,6 +201,9 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
         val_vec_t *outSet = malloc(sizeof(val_vec_t));
         vec_init(outSet);
 
+        metadata->preds = malloc(sizeof(bb_vec_t));
+        vec_init(metadata->preds);
+
         LLVMValueRef bbIterator;
         int idx;
 
@@ -216,19 +214,30 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
         metadata->outSet = outSet;
         vec_push(vec, metadata);
     }
+    computePreds(vec);
 
     // keep applying these changes until we reach a fixed point
     do {
         int idx0;
         meta_t *currMeta;
 
-        // TODO compute predecessors properly
-        // reset the predecessors vector
-        vec_deinit(&preds);
-        vec_init(&preds);
-
         // iterate through each basic block
         vec_foreach(vec, currMeta, idx0) {
+            // IN[B] = union of all the preds of the current BB
+            LLVMBasicBlockRef currPred;
+            int idx3;
+
+            vec_foreach(currMeta->preds, currPred, idx3) {
+                // the meta block that corresponds to the precedessor BB
+                meta_t *predMeta = vec_find_bb(vec, currPred);
+                assert(predMeta != NULL);
+                val_vec_t *oldInSet = currMeta->inSet;
+                currMeta->inSet = (val_vec_t *)setUnion(
+                    (vec_void_t *)oldInSet, (vec_void_t *)predMeta->outSet);
+                vec_deinit(oldInSet);
+                free(oldInSet);
+            }
+
             // $ OUT[B] = GEN[B] \cup (IN[B] - KILL[B])
             // retain old out set for comparison
             val_vec_t *oldOut = currMeta->outSet;
@@ -264,16 +273,47 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
                 !setEqual((vec_void_t *)oldOut, (vec_void_t *)currMeta->outSet);
             vec_deinit(oldOut);
             free(oldOut);
-
-            // add OUT[B] to the predecessors (union set op)
-            vec_foreach(currMeta->outSet, temp, idx2) {
-                int found = -1;
-                vec_find(&preds, temp, found);
-
-                if (found == -1)
-                    vec_push(&preds, temp);
-            }
         }
     } while (changed);
     return vec;
+}
+
+void computePreds(meta_vec_t *vec) {
+    // To get a precedessor, you need to work backwards from the successors.
+    // With the LLVM API, you get the terminating instruction for a basic
+    // block, and compute the successor from there.
+
+    // iterator for loop
+    meta_t *it;
+    int a;
+    vec_foreach(vec, it, a) {
+        LLVMValueRef term = LLVMGetBasicBlockTerminator(it->bb);
+        unsigned int numSuccessors = LLVMGetNumSuccessors(term);
+
+        // loop through each successor and add the current block as a
+        // predecessor to each successor
+        for (unsigned int i = 0; i < numSuccessors; i++) {
+            LLVMBasicBlockRef succ = LLVMGetSuccessor(term, i);
+
+            meta_t *potentialSuccessor;
+            int b;
+
+            vec_foreach(vec, potentialSuccessor, b) {
+                if (potentialSuccessor->bb == succ) {
+                    vec_push(potentialSuccessor->preds, it->bb);
+                }
+            }
+        }
+    }
+}
+
+meta_t *vec_find_bb(meta_vec_t *vec, LLVMBasicBlockRef bb) {
+    meta_t *it;
+    int i;
+
+    vec_foreach(vec, it, i) {
+        if (it->bb == bb)
+            return it;
+    }
+    return NULL;
 }

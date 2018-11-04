@@ -17,12 +17,13 @@
 
 /// A vector of LLVM values
 typedef vec_t(LLVMValueRef) val_vec_t;
+typedef vec_t(LLVMBasicBlockRef) bb_vec_t;
 
 /*** struct definitions ***/
 
 /// A struct containing a basic block and optimization metadata associated
 /// with basic block
-typedef struct meta_s {
+struct meta_s {
     /// The basic block that the sets correspond to. This will be referred to
     /// as $B$
     LLVMBasicBlockRef bb;
@@ -40,8 +41,12 @@ typedef struct meta_s {
     val_vec_t *outSet;
 
     /// The predecessors to the basic block
-    val_vec_t *preds;
-} meta_t;
+    bb_vec_t *preds;
+};
+
+/// A struct containing a basic block and optimization metadata associated
+/// with basic block
+typedef struct meta_s meta_t;
 
 /// A vector of basic blocks and associated metadata
 typedef vec_t(meta_t *) meta_vec_t;
@@ -152,7 +157,25 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S);
  * Given some basic block, this method will compute the precedessors of the
  * basic block in the control flow graph.
  *
- * \param[in] bb The basic block to inspect
+ * \param[in] vec An allocated and initialized vector of metadata, containing
+ * all of the basic blocks that could be predecessors to the current block to
+ * inspect.
+ * \param[in] currBlock the metadata corresponding to the basic block to
+ * compute the precedessors for. This metadata block *must* be in the vector.
  * \returns A new vector with the precedessors of the basic block
  */
-val_vec_t *computePreds(LLVMBasicBlockRef bb);
+void computePreds(meta_vec_t *vec);
+
+/**
+ * \brief Find the metadata block that corresponds to a basic block in a
+ * vector.
+ *
+ * This is a convenienc function that finds the associated metadata structure
+ * for some basic block, given a vector struct.
+ *
+ * \param[in] vec The vector to inspect
+ * \param[in] bb The basic block for which we want to find the metadata
+ * \returns A reference to the metadata entry in the vector that corresponds to
+ * the basic block.
+ */
+meta_t *vec_find_bb(meta_vec_t *vec, LLVMBasicBlockRef bb);

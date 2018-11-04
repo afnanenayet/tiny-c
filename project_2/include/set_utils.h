@@ -12,6 +12,8 @@
  * and not the data or any primitives directly (as is usual with any `void *`
  * "generic" programming.
  */
+#include <stdbool.h>
+
 #include "vec.h"
 
 #pragma once
@@ -63,3 +65,14 @@ vec_void_t *setDedup(vec_void_t *a);
  * \returns Whether the vectors have set equality
  */
 bool setEqual(vec_void_t *a, vec_void_t *b);
+
+/**
+ * \brief Copy a vector or a set into another set.
+ *
+ * Given some set or vector, this function will copy the contents of the
+ * set to another set, then deduplicate the newly copied set.
+ *
+ * \param set[in] The set to copy
+ * \returns A newly allocated vector with unique elements.
+ */
+vec_void_t *setCopy(vec_void_t *set);

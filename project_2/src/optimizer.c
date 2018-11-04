@@ -148,7 +148,7 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
                 // all of the uses of instruction I by the constant in the store
                 // isntructions mark the load instructions for deletion, then
                 // delete them later
-                
+
                 // TODO how do we find the address represented by `%t`
             }
         }
@@ -169,4 +169,4 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
 
 /*** Public function definitions ***/
 
-void optimizeProgram(LLVMModuleRef m) { bool success = walkFunctions(m); }
+void optimizeProgram(LLVMModuleRef m) { walkFunctions(m); }

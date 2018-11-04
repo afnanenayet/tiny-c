@@ -11,6 +11,7 @@ set(program_name optimizer)
 
 # change value to ON if you want to generate doxygen documentation
 option(enable_docs "Generate documentation with Doxygen" ON)
+option(clang_tidy "Enable clang-tidy target" ON)
 
 # enable all warnings
 set(CMAKE_C_FLAGS
@@ -33,6 +34,10 @@ if(enable_docs)
         COMMENT "Generate documentation"
         )
 endif(enable_docs)
+
+# set up clang-tidy integration
+if(clang_tidy)
+endif(clang_tidy)
 
 # add LLVM libraries
 find_package(LLVM REQUIRED CONFIG)

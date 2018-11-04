@@ -40,35 +40,8 @@ LLVMModuleRef createLLVMModel(char *fp) {
     return m;
 }
 
-bool walkBasicblocks(LLVMValueRef function) {
-    bool changed = false;
-    for (LLVMBasicBlockRef basicBlock = LLVMGetFirstBasicBlock(function);
-         basicBlock; basicBlock = LLVMGetNextBasicBlock(basicBlock)) {
-        // TODO run optimization routine here
-        val_vec_t *genSet = computeGenSet(basicBlock);
-        vec_deinit(genSet); // TODO remove
-        free(genSet);
-        genSet = NULL;
-    }
-    return changed;
-}
-
-bool walkFunctions(LLVMModuleRef module) {
-    bool changed = false;
-    for (LLVMValueRef function = LLVMGetFirstFunction(module); function;
-         function = LLVMGetNextFunction(function)) {
-        // TODO do we need this? Instructions say there will only be one
-        // function in the input file? Does it really even matter...?
-        // const char* funcName = LLVMGetValueName(function);
-        changed = changed || walkBasicblocks(function);
-    }
-    return changed;
-}
-
 val_vec_t *computeGenSet(LLVMBasicBlockRef bb) {
     // initialize the empty set
-    // need to malloc because the library assumes the vector is already
-    // allocated and doesn't initialize the struct for you
     val_vec_t *genSet = malloc(sizeof(val_vec_t));
     vec_init(genSet);
 
@@ -76,11 +49,13 @@ val_vec_t *computeGenSet(LLVMBasicBlockRef bb) {
     for (LLVMValueRef inst = LLVMGetFirstInstruction(bb); inst;
          inst = LLVMGetNextInstruction(inst)) {
         // if the instruction is a store instruction, store it in the set
+        // We do this later, because first we need to remove any other
+        // instructions that get killed by the current instruction, otherwise
+        // it will get removed in the next step
         if (LLVMIsAStoreInst(inst)) {
 #ifdef DEBUG
             println("(gen set) found store instruction");
 #endif
-            vec_push(genSet, inst);
         }
         // get memory location of the store instruction
         LLVMValueRef newStoreLoc = LLVMGetOperand(inst, 1);
@@ -99,6 +74,7 @@ val_vec_t *computeGenSet(LLVMBasicBlockRef bb) {
                 vec_remove(genSet, val);
             }
         }
+        vec_push(genSet, inst);
     }
     return genSet;
 }
@@ -119,9 +95,8 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb, val_vec_t *S) {
          inst = LLVMGetNextInstruction(inst)) {
         // only need to look at instructions that store constants, otherwise
         // skip to next instruction
-        // TODO: figure out if I'm checking the correct operand
         if (!(LLVMIsAStoreInst(inst) &&
-              LLVMIsAConstant(LLVMGetOperand(inst, 1))))
+              LLVMIsAConstant(LLVMGetOperand(inst, 0))))
             continue;
 
 #ifdef DEBUG
@@ -135,14 +110,7 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb, val_vec_t *S) {
         vec_foreach(S, val, i) {
             LLVMValueRef listLoc = LLVMGetOperand(val, 1);
 
-            // Break once we get to the current instruction because an
-            // instruction can't kill itself or other store instructions
-            // that come after it. If there is a match on the location,
-            // we know that the current instruction kills this previous
-            // instruction
-            if (inst == val)
-                break;
-            else if (currLoc == listLoc) {
+            if (currLoc == listLoc) {
                 vec_push(killSet, val);
 #ifdef DEBUG
                 println("(kill set) constant store instruction kills previous "
@@ -151,7 +119,6 @@ val_vec_t *computeKillSet(LLVMBasicBlockRef bb, val_vec_t *S) {
             }
         }
     }
-    vec_deinit(S);
     return killSet;
 }
 

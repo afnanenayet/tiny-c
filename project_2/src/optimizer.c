@@ -119,6 +119,10 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
         int j;
         vec_foreach(meta->inSet, temp, j) { vec_push(&R, temp); }
 
+#ifdef DEBUG
+        printf("(constProp) R initially has %d values\n", R.length);
+#endif
+
         // loop through each instruction in the basic block
         LLVMBasicBlockRef basicBlock = meta->bb;
 
@@ -128,6 +132,9 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
             if (LLVMIsAStoreInst(inst) &&
                 LLVMIsAConstant(LLVMGetOperand(inst, 0))) {
                 vec_push(&R, inst);
+#ifdef DEBUG
+                println("(constProp) Add constant store instruction to R");
+#endif
             } else if (LLVMIsAStoreInst(inst)) {
                 // if I is a store instruction, remove everything in R that is
                 // killed by the instruction I
@@ -136,8 +143,13 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
                 vec_foreach(&R, tempInst, j) {
                     LLVMValueRef otherAddr = LLVMGetOperand(tempInst, 1);
 
-                    if (otherAddr == addr)
+                    if (otherAddr == addr) {
                         vec_remove(&R, tempInst);
+#ifdef DEBUG
+                        println(
+                            "(constProp) Removed killed instructions in set R");
+#endif
+                    }
                 }
             } else if (LLVMIsALoadInst(inst)) {
                 // If I is a load instruction that loads from the address
@@ -161,6 +173,10 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
                 vec_foreach(&R, it, j) {
                     if (LLVMIsAStoreInst(it) &&
                         (LLVMGetOperand(it, 1) == loadAddr)) {
+#ifdef DEBUG
+                        println("(constProp) Found store instruction that "
+                                "stores to this load address");
+#endif
                         vec_push(&temp, it);
                     }
                 }
@@ -168,7 +184,7 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
                 // bail if no optimizations can be made
                 if (R.length < 1) {
                     vec_deinit(&temp);
-                    break;
+                    continue;
                 }
 
                 // need to make sure all store ops are writing the same constant
@@ -189,12 +205,16 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
                 // bail out if no optimizations can be made
                 if (!allConstStoreInsts) {
                     vec_deinit(&temp);
-                    break;
+                    continue;
                 }
 
                 // replace all uses of the current load instruction with a
                 // store instruction that stores a constant
                 LLVMReplaceAllUsesWith(inst, constant);
+#ifdef DEBUG
+                println(
+                    "(constProp) Replacing load instruction(s) with constant");
+#endif
                 changed = true;
                 vec_deinit(&temp);
                 vec_push(&toDelete, inst);
@@ -209,7 +229,7 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
     }
     // if anything was deleted, then changes have been made
     // otherwise, we hvae reached a fixed point
-    changed = toDelete.length > 0;
+    changed = changed || toDelete.length > 0;
     vec_deinit(&toDelete);
     vec_deinit(&R);
     return changed;

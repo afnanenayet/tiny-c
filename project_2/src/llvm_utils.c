@@ -168,6 +168,9 @@ val_vec_t *computeS(LLVMValueRef fn) {
              inst = LLVMGetNextInstruction(inst)) {
             if (LLVMIsAStoreInst(inst) &&
                 LLVMIsAConstant(LLVMGetOperand(inst, 1))) {
+#ifdef DEBUG
+                println("(computeS) found store inst");
+#endif
                 vec_push(S, inst);
             }
         }
@@ -211,6 +214,9 @@ meta_vec_t *computeBlockMData(LLVMValueRef fn, val_vec_t *S) {
         vec_foreach(metadata->genSet, bbIterator, idx) {
             vec_push(outSet, bbIterator);
         }
+#ifdef DEBUG
+        println("(computeBlockMData) copied gen set to out set");
+#endif
         metadata->outSet = outSet;
         vec_push(vec, metadata);
     }
@@ -290,6 +296,10 @@ void computePreds(meta_vec_t *vec) {
         LLVMValueRef term = LLVMGetBasicBlockTerminator(it->bb);
         unsigned int numSuccessors = LLVMGetNumSuccessors(term);
 
+#ifdef DEBUG
+        printf("(computePreds) There are %d successors\n", numSuccessors);
+#endif
+
         // loop through each successor and add the current block as a
         // predecessor to each successor
         for (unsigned int i = 0; i < numSuccessors; i++) {
@@ -301,6 +311,9 @@ void computePreds(meta_vec_t *vec) {
             vec_foreach(vec, potentialSuccessor, b) {
                 if (potentialSuccessor->bb == succ) {
                     vec_push(potentialSuccessor->preds, it->bb);
+#ifdef DEBUG
+                    println("(computePreds) Found successor");
+#endif
                 }
             }
         }

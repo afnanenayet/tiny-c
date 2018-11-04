@@ -35,9 +35,9 @@ if(enable_docs)
         )
 endif(enable_docs)
 
-# set up clang-tidy integration
-if(clang_tidy)
-endif(clang_tidy)
+# set up clang-tidy integration TODO
+# if(clang_tidy)
+# endif(clang_tidy)
 
 # add LLVM libraries
 find_package(LLVM REQUIRED CONFIG)

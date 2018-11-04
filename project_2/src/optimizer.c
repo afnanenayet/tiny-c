@@ -169,4 +169,9 @@ static bool constProp(LLVMValueRef fn, meta_vec_t *basicBlocks) {
 
 /*** Public function definitions ***/
 
-void optimizeProgram(LLVMModuleRef m) { walkFunctions(m); }
+void optimizeProgram(LLVMModuleRef m) {
+    // get metadata for each basic block
+    LLVMValueRef function = LLVMGetFirstFunction(m);
+    val_vec_t *S = computeS(function);
+    meta_vec_t *metadata = computeBlockMData(function, S);
+}

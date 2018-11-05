@@ -13,7 +13,9 @@ set(program_name optimizer)
 option(enable_docs "Generate documentation with Doxygen" OFF)
 option(clang_tidy "Enable clang-tidy target" OFF)
 
-option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
+# For usage with ninja if you want to enable pretty printed output
+option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+
 if (${FORCE_COLORED_OUTPUT})
     if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
        add_compile_options (-fdiagnostics-color=always)
@@ -27,15 +29,8 @@ set(CMAKE_C_FLAGS
     "${CMAKE_C_FLAGS} -Wall -Wpedantic"
     )
 set (CMAKE_C_FLAGS_DEBUG
-    # "${CMAKE_C_FLAGS_DEBUG} -DDEBUG -Wall -Wpedantic -fsanitize=address -fno-omit-frame-pointer"
     "${CMAKE_C_FLAGS_DEBUG} -Wall -Wpedantic -DDEBUG"
     )
-# set (CMAKE_LINKER_FLAGS_DEBUG
-#    "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
-#    )
-#set (CMAKE_STATIC_LINKER_FLAGS_DEBUG
-#    "${CMAKE_STATIC_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address"
-#    )
 
 # optional doxygen package to generate docs
 if(enable_docs)
@@ -46,10 +41,6 @@ if(enable_docs)
         COMMENT "Generate documentation"
         )
 endif(enable_docs)
-
-# set up clang-tidy integration TODO
-# if(clang_tidy)
-# endif(clang_tidy)
 
 # add LLVM libraries
 find_package(LLVM REQUIRED CONFIG)

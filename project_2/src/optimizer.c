@@ -250,7 +250,7 @@ void optimizeProgram(LLVMModuleRef m) {
 
     bool changed = false;
 
-    // the number of passes the optimization routine takes
+    // the number of passes the optimization routine makes
     unsigned int optimizationPasses = 0;
 
     // continue optimizing until the fixed-point

@@ -42,3 +42,15 @@ And change it to:
 ```cmake
 option(enable_docs "Generate documentation with Doxygen" ON)
 ```
+
+There is also a debug flag which will enable debugging statements that get
+printed to `stdout`. You can enable these by building in debug mode. It will
+also enable standard debug flags and export debugging information so that you
+can easily analyze the binary using `gdb` or `lldb`.
+
+```sh
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+make
+```

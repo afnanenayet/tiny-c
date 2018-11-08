@@ -10,13 +10,15 @@ set(EXPORT_COMPILE_COMMANDS ON)
 # Enforce C++17 support
 set(CMAKE_CXX_STANDARD 17)
 set_property(TARGET PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET PROPERTY CXX_EXTENSIONS OFF)
 
 # add LLVM libraries
 find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 add_definitions(${LLVM_DEFINITIONS})
+
+# flags
+set(CMAKE_CXX_FLAGS "${CMAKE_FXX_FLAGS} -Werror -Wall -Wpedantic -lstdc++fs")
 
 # for convenience when referencing the libraries
 llvm_map_components_to_libnames(llvm_libs support core irreader)
@@ -28,6 +30,7 @@ include_directories(
 
 add_executable(${program_name}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/LLVMUtils.cpp
     )
 
 target_link_libraries(${program_name}

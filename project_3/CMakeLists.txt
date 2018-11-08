@@ -4,13 +4,13 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-set(EXPORT_COMPILE_COMMANDS ON)
 set(program_name RegAlloc)
+set(EXPORT_COMPILE_COMMANDS ON)
 
 # Enforce C++17 support
 set(CMAKE_CXX_STANDARD 17)
-set_property(TARGET ${program_name} PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(CXX_EXTENSIONS OFF)
+set_property(TARGET PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET PROPERTY CXX_EXTENSIONS OFF)
 
 # add LLVM libraries
 find_package(LLVM REQUIRED CONFIG)

@@ -17,8 +17,12 @@ message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 add_definitions(${LLVM_DEFINITIONS})
 
-# flags
-set(CMAKE_CXX_FLAGS "${CMAKE_FXX_FLAGS} -Werror -Wall -Wpedantic -lstdc++fs")
+# Clang doesn't require any flags to link std::filesystem, but GCC does
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_FXX_FLAGS} -Werror -Wall -Wpedantic")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_FXX_FLAGS} -Werror -Wall -Wpedantic -lstdc++fs")
+endif()
 
 # for convenience when referencing the libraries
 llvm_map_components_to_libnames(llvm_libs support core irreader)

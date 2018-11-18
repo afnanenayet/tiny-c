@@ -52,6 +52,14 @@ class RegisterAllocator {
      */
     void generateTables();
 
+    /*!
+     * \brief Initialize the member variables for the class
+     *
+     * Intialize member variables of the class that aren't initialized
+     * externally so that they can be consumed by other functions.
+     */
+    void initializeMembers();
+
     //! The basic block that's being operated on
     const llvm::BasicBlock *basicBlock;
 
@@ -67,4 +75,7 @@ class RegisterAllocator {
 
     //! A mapping of instructions for each basic block
     std::shared_ptr<IntervalTable> intervalTable;
+
+    //! A mapping of instructions to their register
+    std::shared_ptr<RegisterTable> registerTable;
 };

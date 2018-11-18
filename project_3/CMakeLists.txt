@@ -44,6 +44,7 @@ include_directories(
 add_executable(${program_name}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LLVMUtils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/codegen.cpp
     )
 
 target_link_libraries(${program_name}

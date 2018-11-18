@@ -158,3 +158,18 @@ std::shared_ptr<ResultTable>
 genResultTable(const llvm::BasicBlock &bb,
                std::shared_ptr<RegisterTable> &registers,
                std::shared_ptr<SortedIntervalList> &liveness);
+
+/*!
+ * \brief Find the operands that overlap with the given instruction
+ *
+ * Given the sorted interval list, find the instructions that overlap with the
+ * given instruction that are not equal to it. We define overlap as the given
+ * instruction has an interval [a, b] and either there exists some other
+ * interval [x, y] such that $x \leq a \leq y$ or $x \leq b \leq y$.
+ *
+ * \param[in] inst The instruction to inspect
+ * \param[in] intervals A sorted list of operands and intervals
+ */
+std::unique_ptr<std::vector<const llvm::Instruction *>>
+getOverlappingOps(const llvm::Instruction *inst,
+                  const std::shared_ptr<SortedIntervalList> &intervals);

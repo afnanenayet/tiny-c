@@ -136,6 +136,94 @@ std::shared_ptr<ResultTable>
 genResultTable(const llvm::BasicBlock &bb,
                std::shared_ptr<RegisterTable> &registers,
                std::shared_ptr<SortedIntervalList> &liveness) {
+    // initialize the empty result table
     auto results = std::make_shared<ResultTable>();
+
+    // If the terminator instruction is a return instruction, take `%eax`
+    if (auto returnInst =
+            llvm::dyn_cast<llvm::ReturnInst>(bb.getTerminator())) {
+        auto operand =
+            returnInst->getOperand(0); // TODO figure out if this is correct
+
+        // convert back to instruction to add it to the hashtable
+        if (auto operandInst = llvm::dyn_cast<llvm::Instruction>(operand)) {
+            results->insert(std::make_pair(operandInst, eax));
+
+            // find every operand that overlaps with the current interval
+            // table and remove `eax` from their list of available registers
+            auto overlappingOps = getOverlappingOps(operandInst, liveness);
+
+            for (const auto overlappingInst : *overlappingOps) {
+                auto foundInst = registers->find(overlappingInst);
+
+                // skip if we can't find the instruction in the register table
+                if (foundInst == registers->end()) {
+                    continue;
+                }
+                foundInst->second.erase(eax);
+            }
+        }
+    }
+
+    // Iterate through the liveness table, taking the longest entries that don't have any
+    // entries in the results table. Add the entry to the result table, adding a
+    // register to the table, then remove that register from the set of physical registers
+    // for any op whose intervals overlap with that instruction.
+    for (auto &entry : *liveness) {
+        // Check to see if the instruction is already in the results table. If
+        // so, move on to the next one.
+        if (results->find(entry.first) == results->end())
+            continue;
+
+        auto registerEntry = registers->find(entry.first);
+
+        if (registerEntry == registers->end())
+            throw std::runtime_error(
+                "Liveness table contains operand not found in registers table");
+
+        auto registerSet = registerEntry->second;
+
+        // skip if there are no registers available for the instruction
+        if (registerSet.size() == 0)
+            continue;
+
+        // pick some register to use
+        auto selectedRegister = *registerSet.begin();
+        results->insert(std::make_pair(entry.first, selectedRegister));
+    }
     return results;
+}
+
+std::unique_ptr<std::vector<const llvm::Instruction *>>
+getOverlappingOps(const llvm::Instruction *inst,
+                  const std::shared_ptr<SortedIntervalList> &intervals) {
+    // find interval for given instruction
+    std::tuple<int, int> targetInterval;
+    // std::vector<std::tuple<int, int>> overlapping;
+    auto overlapping =
+        std::make_unique<std::vector<const llvm::Instruction *>>();
+
+    for (const auto &intervalEntry : *intervals) {
+        if (intervalEntry.first == inst) {
+            targetInterval = intervalEntry.second;
+            break;
+        }
+    }
+
+    // iterate through the intervals, checking to see if the targetInterval
+    // is overlapped by the intervals
+    for (const auto &intervalEntry : *intervals) {
+        if (intervalEntry.first == inst)
+            continue;
+
+        const auto otherInterval = intervalEntry.second;
+
+        if ((std::get<0>(targetInterval) <= std::get<0>(otherInterval) &&
+             std::get<0>(otherInterval) <= std::get<1>(targetInterval)) ||
+            (std::get<0>(targetInterval) <= std::get<1>(otherInterval) &&
+             std::get<1>(otherInterval) <= std::get<1>(targetInterval))) {
+            overlapping->push_back(intervalEntry.first);
+        }
+    }
+    return overlapping;
 }

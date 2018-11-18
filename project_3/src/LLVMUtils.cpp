@@ -1,7 +1,7 @@
+#include <cstring>
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
-#include <cstring>
 #include <unordered_map>
 
 #include <llvm/IR/BasicBlock.h>
@@ -22,7 +22,7 @@ std::unique_ptr<llvm::Module> loadModule(const std::string &filename,
 
     if (module == nullptr) {
         throw std::runtime_error("Could not parse IR file!");
-}
+    }
     return module;
 }
 
@@ -61,9 +61,9 @@ std::shared_ptr<IndexTable> genIndexTable(const llvm::BasicBlock &bb) {
 }
 
 void tableInit(const llvm::BasicBlock &bb,
-               const std::shared_ptr<IndexTable>& indexTable,
-               const std::shared_ptr<IntervalTable>& intervalTable,
-               const std::shared_ptr<RegisterTable>& registers) {
+               const std::shared_ptr<IndexTable> &indexTable,
+               const std::shared_ptr<IntervalTable> &intervalTable,
+               const std::shared_ptr<RegisterTable> &registers) {
     const auto &instList = bb.getInstList();
 
     // iterate backwards through each instruction in the basic block
@@ -78,17 +78,20 @@ void tableInit(const llvm::BasicBlock &bb,
             if (llvm::dyn_cast<llvm::Constant>(user) != nullptr ||
                 llvm::dyn_cast<llvm::AllocaInst>(user) != nullptr) {
                 continue;
-            } if (const auto opInst =
-                           llvm::dyn_cast<llvm::Instruction>(user)) {
+            }
+            if (const auto opInst = llvm::dyn_cast<llvm::Instruction>(user)) {
                 // check if the operand already exists in the liveliness table
                 auto searchIt = intervalTable->find(opInst);
 
                 // if it already exists, move on to the next operand
                 if (searchIt != intervalTable->end()) {
                     continue;
-}
+                }
 
                 // insert the interval into the interval table
+                // This will throw an error if the instructions aren't in the
+                // index table, but that would be a logic error so that means
+                // the indexTable isn't being constructed properly
                 auto interval = std::make_pair(indexTable->find(opInst)->second,
                                                indexTable->find(&inst)->second);
                 intervalTable->insert(std::make_pair(opInst, interval));
@@ -105,13 +108,21 @@ void tableInit(const llvm::BasicBlock &bb,
     }
 }
 
-std::shared_ptr<SortedIntervalTable>
-sortIntervalMap(const std::shared_ptr<IntervalTable>& table) {
-    auto sortedMap = std::make_shared<SortedIntervalTable>();
+std::shared_ptr<SortedIntervalList>
+sortIntervalMap(const std::shared_ptr<IntervalTable> &table) {
+    auto sortedMap = std::make_shared<SortedIntervalList>();
 
     // copy each element from the interval table to the sorted interval table
-    for (auto & it : *table) {
-        sortedMap->insert(std::make_pair(it.first, it.second));
+    for (auto &it : *table) {
+        sortedMap->push_back(std::make_pair(it.first, it.second));
     }
+    std::sort(sortedMap->begin(), sortedMap->end(),
+              [=](const auto &a, const auto &b) -> bool {
+                  auto aTuple = a.second;
+                  auto bTuple = b.second;
+                  auto aLength = std::get<1>(aTuple) - std::get<0>(aTuple);
+                  auto bLength = std::get<1>(bTuple) - std::get<0>(bTuple);
+                  return aLength > bLength;
+              });
     return sortedMap;
 }

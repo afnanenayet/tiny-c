@@ -49,10 +49,11 @@ std::shared_ptr<IndexTable> genIndexTable(const llvm::BasicBlock &bb) {
 
     // iterate through each instruction, only incrementing if the instruction
     // is not an `alloc` instruction
-    // Note: the example code does not check to see if an instruction is an
-    // `alloca` instruction, so I did not do so here
     for (const auto &inst : bb) {
-        table->insert(std::make_pair(&inst, i++));
+        // ensure that the opcode is NOT an alloc instruction
+        if (strcmp(inst.getOpcodeName(), "alloca") != 0) {
+            table->insert(std::make_pair(&inst, i++));
+        }
     }
     return table;
 }

@@ -197,7 +197,7 @@ genResultTable(const llvm::BasicBlock &bb,
 
         // skip if there are no registers available for the instruction
         if (registerSet.size() == 0) {
-            results->insert(std::make_pair(entry.first, null));
+            results->insert(std::make_pair(entry.first, nullRegister));
             continue;
         }
 
@@ -213,7 +213,6 @@ genResultTable(const llvm::BasicBlock &bb,
         for (const auto &overlappingInst : *overlaps) {
             auto registerEntry = registers->find(overlappingInst);
 
-            // should never happen
             if (registerEntry == registers->end())
                 throw std::runtime_error(
                     "Found instruction from overlapping vector that was not in "

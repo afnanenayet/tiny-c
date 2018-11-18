@@ -26,7 +26,7 @@ typedef enum {
     ebx,
     ecx,
     edx,
-    null,
+    nullRegister,
 } PhysicalRegister;
 
 //! A set of physical registers

@@ -5,7 +5,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 set(program_name RegAlloc)
-set(EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Enforce C++17 support
 set(CMAKE_CXX_STANDARD 17)

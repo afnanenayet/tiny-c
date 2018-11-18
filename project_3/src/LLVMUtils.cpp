@@ -165,10 +165,22 @@ genResultTable(const llvm::BasicBlock &bb,
         }
     }
 
-    // Iterate through the liveness table, taking the longest entries that don't have any
-    // entries in the results table. Add the entry to the result table, adding a
-    // register to the table, then remove that register from the set of physical registers
-    // for any op whose intervals overlap with that instruction.
+    // Iterate through the liveness table, taking the longest entries that don't
+    // have any entries in the results table. Add the entry to the result table,
+    // adding a register to the table, then remove that register from the set of
+    // physical registers for any op whose intervals overlap with that
+    // instruction.
+    //
+    // In the instructions, it says to keep repeating until all of the values
+    // are loaded into the table, but going through the entire liveness table
+    // achieves the same effect because all variables have *some* liveness
+    // interval. Once all the variables are loaded, they will be in the results
+    // table, which gets caught by the first check, so there's no fear of
+    // redundances.
+    //
+    // Because the liveness entries are sorted in descending order from longest
+    // to shortest, this ends up giving precedence to the longer intervals,
+    // which also maintains the invariant stated in the instructions.
     for (auto &entry : *liveness) {
         // Check to see if the instruction is already in the results table. If
         // so, move on to the next one.
@@ -184,12 +196,31 @@ genResultTable(const llvm::BasicBlock &bb,
         auto registerSet = registerEntry->second;
 
         // skip if there are no registers available for the instruction
-        if (registerSet.size() == 0)
+        if (registerSet.size() == 0) {
+            results->insert(std::make_pair(entry.first, null));
             continue;
+        }
 
         // pick some register to use
         auto selectedRegister = *registerSet.begin();
         results->insert(std::make_pair(entry.first, selectedRegister));
+
+        // get overlapping instructions
+        auto overlaps = getOverlappingOps(entry.first, liveness);
+
+        // remove the selected register from the available registers for
+        // each overlapping instruction
+        for (const auto &overlappingInst : *overlaps) {
+            auto registerEntry = registers->find(overlappingInst);
+
+            // should never happen
+            if (registerEntry == registers->end())
+                throw std::runtime_error(
+                    "Found instruction from overlapping vector that was not in "
+                    "register table");
+
+            registerEntry->second.erase(selectedRegister);
+        }
     }
     return results;
 }
@@ -199,7 +230,6 @@ getOverlappingOps(const llvm::Instruction *inst,
                   const std::shared_ptr<SortedIntervalList> &intervals) {
     // find interval for given instruction
     std::tuple<int, int> targetInterval;
-    // std::vector<std::tuple<int, int>> overlapping;
     auto overlapping =
         std::make_unique<std::vector<const llvm::Instruction *>>();
 

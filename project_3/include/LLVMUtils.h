@@ -49,7 +49,8 @@ typedef std::unordered_map<const llvm::Instruction *, unsigned int> IndexTable;
 typedef std::unordered_map<const llvm::Instruction *, Interval> IntervalTable;
 
 //! An ordered map of instructions to liveness intervals
-typedef std::map<const llvm::Instruction *, Interval> SortedIntervalTable;
+//! A sorted vector of instructions paired to their liveness intervals
+typedef std::vector<std::pair<const llvm::Instruction *, Interval>> SortedIntervalList;
 
 /*!
  * \brief Temporary register to physical register table.
@@ -123,9 +124,9 @@ std::shared_ptr<IndexTable> genIndexTable(const llvm::BasicBlock &bb);
  * \param[out] registers An allocated shared pointer for the register table
  */
 void tableInit(const llvm::BasicBlock &bb,
-               const std::shared_ptr<IndexTable>& indexTable,
-               const std::shared_ptr<IntervalTable>& intervalTable,
-               const std::shared_ptr<RegisterTable>& registers);
+               const std::shared_ptr<IndexTable> &indexTable,
+               const std::shared_ptr<IntervalTable> &intervalTable,
+               const std::shared_ptr<RegisterTable> &registers);
 
 /*!
  * \brief Sort a given interval table by the length of its interval
@@ -136,5 +137,5 @@ void tableInit(const llvm::BasicBlock &bb,
  * \param[in] table The table to sort
  * \returns An ordered map of operands to their intervals
  */
-std::shared_ptr<SortedIntervalTable>
-sortIntervalMap(const std::shared_ptr<IntervalTable>& table);
+std::shared_ptr<SortedIntervalList>
+sortIntervalMap(const std::shared_ptr<IntervalTable> &table);

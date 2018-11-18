@@ -27,6 +27,9 @@ typedef enum {
     edx,
 } PhysicalRegister;
 
+//! A set of physical registers
+typedef std::set<PhysicalRegister> RegisterSet;
+
 //! A mapping from an instruction to its byte offset
 typedef std::unordered_map<const llvm::Instruction *, int> OffsetTable;
 
@@ -48,7 +51,7 @@ typedef std::unordered_map<const llvm::Instruction *, std::tuple<int, int>>
  * A mapping from an temporary instruction/register to the corresponding
  * available physical registers.
  */
-typedef std::unordered_map<std::shared_ptr<llvm::Instruction>,
+typedef std::unordered_map<const llvm::Instruction *,
                            std::set<PhysicalRegister>>
     RegisterTable;
 
@@ -101,15 +104,19 @@ std::shared_ptr<OffsetTable> genOffsetTable(const llvm::Function &func);
 std::shared_ptr<IndexTable> genIndexTable(const llvm::BasicBlock &bb);
 
 /*!
- * \brief Create the liveliness table for each instruction in a basic block
+ * \brief Generate the liveliness and register tables for a basic block
  *
  * Given some basic block, this method will generate the table to determine
- * how long each instruction is "alive" for, and will store that as a tuple
+ * how long each instruction is "alive" for, and will store that as a tuple.
+ * It will also initialize the physical register table for each instruction
+ * or op.
  *
  * \param[in] bb The basic block to inspect
- * \param[in] The populated index table
- * \returns A table that contains the live interval for each instruction
+ * \param[in] indexTable The populated index table
+ * \param[out] intervalTable An allocated shared pointer for the interval table
+ * \param[out] registers An allocated shared pointer for the register table
  */
-std::shared_ptr<IntervalTable>
-genIntervalTable(const llvm::BasicBlock &bb,
-                 const std::shared_ptr<IndexTable> indexTable);
+void tableInit(const llvm::BasicBlock &bb,
+               const std::shared_ptr<IndexTable> indexTable,
+               std::shared_ptr<IntervalTable> intervalTable,
+               std::shared_ptr<RegisterTable> registers);

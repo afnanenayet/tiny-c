@@ -47,22 +47,58 @@ std::shared_ptr<IndexTable> genIndexTable(const llvm::BasicBlock &bb) {
     // the counter for the instructions
     unsigned i = 0;
 
-    // iterate through each instruction, only incrementing if the instruction
-    // is not an `alloc` instruction
+    // iterate through each instruction and add the index to the table
+    // Note that the instructions say to skip "alloc" instructions, but
+    // the example code doesn't do so, and it seems that we need to use
+    // alloc instructions that define variables in the register allocation
+    // section
     for (const auto &inst : bb) {
         // ensure that the opcode is NOT an alloc instruction
-        if (strcmp(inst.getOpcodeName(), "alloca") != 0) {
-            table->insert(std::make_pair(&inst, i++));
-        }
+        table->insert(std::make_pair(&inst, i++));
     }
     return table;
 }
 
-std::shared_ptr<IntervalTable>
-genIntervalTable(const llvm::BasicBlock &bb,
-                 const std::shared_ptr<IndexTable> indexTable) {
-    auto table = std::make_shared<IntervalTable>();
-    // iterate backwards through the instructions
-    // TODO
-    return table;
+void tableInit(const llvm::BasicBlock &bb,
+               const std::shared_ptr<IndexTable> indexTable,
+               std::shared_ptr<IntervalTable> intervalTable,
+               std::shared_ptr<RegisterTable> registers) {
+    const auto &instList = bb.getInstList();
+
+    // iterate backwards through each instruction in the basic block
+    for (auto it = instList.rbegin(); it != instList.rend(); it++) {
+        auto &inst = *it;
+
+        // check each operand:
+        // if the operand is non-memory and non-constant, check if it already
+        // exists in the interval table
+        for (auto user : inst.users()) {
+            // ignore constant or memory (alloca instruction)
+            if (llvm::dyn_cast<llvm::Constant>(user) != nullptr ||
+                llvm::dyn_cast<llvm::AllocaInst>(user) != nullptr) {
+                continue;
+            } else if (const auto opInst =
+                           llvm::dyn_cast<llvm::Instruction>(user)) {
+                // check if the operand already exists in the liveliness table
+                auto searchIt = intervalTable->find(opInst);
+
+                // if it already exists, move on to the next operand
+                if (searchIt != intervalTable->end())
+                    continue;
+
+                // insert the interval into the interval table
+                auto interval = std::make_pair(indexTable->find(opInst)->second,
+                                               indexTable->find(&inst)->second);
+                intervalTable->insert(std::make_pair(opInst, interval));
+
+                // insert all of the physical registers for this operand
+                auto s = RegisterSet();
+                s.insert(eax);
+                s.insert(ebx);
+                s.insert(ecx);
+                s.insert(edx);
+                registers->insert(std::make_pair(opInst, s));
+            }
+        }
+    }
 }

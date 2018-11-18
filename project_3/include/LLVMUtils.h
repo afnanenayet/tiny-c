@@ -7,6 +7,7 @@
  * Convenience/helper functions that help parse and interact with LLVM IR in
  * the context of global register allocation
  */
+#include <map>
 #include <set>
 #include <string>
 #include <tuple>
@@ -30,6 +31,9 @@ typedef enum {
 //! A set of physical registers
 typedef std::set<PhysicalRegister> RegisterSet;
 
+//! An interval from one instruction index to another
+typedef std::tuple<int, int> Interval;
+
 //! A mapping from an instruction to its byte offset
 typedef std::unordered_map<const llvm::Instruction *, int> OffsetTable;
 
@@ -42,8 +46,10 @@ typedef std::unordered_map<const llvm::Instruction *, unsigned int> IndexTable;
  * A mapping from an LLVM instruction to its liveness interval (a tuple of two
  * integers that represent a variable from when it's live to when it dies)
  */
-typedef std::unordered_map<const llvm::Instruction *, std::tuple<int, int>>
-    IntervalTable;
+typedef std::unordered_map<const llvm::Instruction *, Interval> IntervalTable;
+
+//! An ordered map of instructions to liveness intervals
+typedef std::map<const llvm::Instruction *, Interval> SortedIntervalTable;
 
 /*!
  * \brief Temporary register to physical register table.
@@ -117,6 +123,18 @@ std::shared_ptr<IndexTable> genIndexTable(const llvm::BasicBlock &bb);
  * \param[out] registers An allocated shared pointer for the register table
  */
 void tableInit(const llvm::BasicBlock &bb,
-               const std::shared_ptr<IndexTable> indexTable,
-               std::shared_ptr<IntervalTable> intervalTable,
-               std::shared_ptr<RegisterTable> registers);
+               const std::shared_ptr<IndexTable>& indexTable,
+               const std::shared_ptr<IntervalTable>& intervalTable,
+               const std::shared_ptr<RegisterTable>& registers);
+
+/*!
+ * \brief Sort a given interval table by the length of its interval
+ *
+ * Given a hashmap of operands and liveness intervals, this method sorts the
+ * hashmap from longest interval to smallest interval.
+ *
+ * \param[in] table The table to sort
+ * \returns An ordered map of operands to their intervals
+ */
+std::shared_ptr<SortedIntervalTable>
+sortIntervalMap(const std::shared_ptr<IntervalTable>& table);

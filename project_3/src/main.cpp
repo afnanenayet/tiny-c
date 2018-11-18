@@ -1,7 +1,7 @@
-#include <iostream>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IRReader/IRReader.h>
+#include <iostream>
 
 #include "LLVMUtils.h"
 

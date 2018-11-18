@@ -21,7 +21,7 @@ std::unique_ptr<llvm::Module> loadModule(const std::string &filename,
     auto module = llvm::parseIRFile(filename, diag, context);
 
     if (module == nullptr)
-        throw std::runtime_error("Could not parse IR file");
+        throw std::runtime_error("Could not parse IR file!");
     return module;
 }
 

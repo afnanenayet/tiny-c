@@ -116,13 +116,26 @@ sortIntervalMap(const std::shared_ptr<IntervalTable> &table) {
     for (auto &it : *table) {
         sortedMap->push_back(std::make_pair(it.first, it.second));
     }
+
+    // sort the vector, using the length of the interval
     std::sort(sortedMap->begin(), sortedMap->end(),
               [=](const auto &a, const auto &b) -> bool {
                   auto aTuple = a.second;
                   auto bTuple = b.second;
                   auto aLength = std::get<1>(aTuple) - std::get<0>(aTuple);
                   auto bLength = std::get<1>(bTuple) - std::get<0>(bTuple);
+
+                  // returning a > b will sort the vector in descending order
+                  // since the default is a < b
                   return aLength > bLength;
               });
     return sortedMap;
+}
+
+std::shared_ptr<ResultTable>
+genResultTable(const llvm::BasicBlock &bb,
+               std::shared_ptr<RegisterTable> &registers,
+               std::shared_ptr<SortedIntervalList> &liveness) {
+    auto results = std::make_shared<ResultTable>();
+    return results;
 }

@@ -40,6 +40,10 @@ typedef std::unordered_map<const llvm::Instruction *, int> OffsetTable;
 //! A mapping from an instruction to its index
 typedef std::unordered_map<const llvm::Instruction *, unsigned int> IndexTable;
 
+//! A mapping from an instruction to an available register
+typedef std::unordered_map<const llvm::Instruction *, PhysicalRegister>
+    ResultTable;
+
 /*!
  * \brief A table from instructions to their liveliness intervals
  *
@@ -50,7 +54,8 @@ typedef std::unordered_map<const llvm::Instruction *, Interval> IntervalTable;
 
 //! An ordered map of instructions to liveness intervals
 //! A sorted vector of instructions paired to their liveness intervals
-typedef std::vector<std::pair<const llvm::Instruction *, Interval>> SortedIntervalList;
+typedef std::vector<std::pair<const llvm::Instruction *, Interval>>
+    SortedIntervalList;
 
 /*!
  * \brief Temporary register to physical register table.
@@ -139,3 +144,17 @@ void tableInit(const llvm::BasicBlock &bb,
  */
 std::shared_ptr<SortedIntervalList>
 sortIntervalMap(const std::shared_ptr<IntervalTable> &table);
+
+/*!
+ * \brief Create the result table for a basic block
+ *
+ * \param[in] bb The basic block to inspect
+ * \param[in] registers The populated register table
+ * \param[in] liveness A list of pairs of instructions and their liveness
+ * intervals sorted by the length of the liveness interval
+ * \returns A populated result table with the register for each instruction
+ */
+std::shared_ptr<ResultTable>
+genResultTable(const llvm::BasicBlock &bb,
+               std::shared_ptr<RegisterTable> &registers,
+               std::shared_ptr<SortedIntervalList> &liveness);

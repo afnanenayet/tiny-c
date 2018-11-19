@@ -201,6 +201,34 @@ std::string RegisterAllocator::findOp(const llvm::Value &inst) const {
             ss << "$";
             ss << val->getSExtValue();
         }
+    } else if (llvm::isa<llvm::Instruction>(inst)) {
+        auto instPtr = static_cast<const llvm::Instruction *>(&inst);
+
+        // first, check to see if the operand has a register
+        auto regCandidate = resultTable->find(instPtr);
+
+        if (regCandidate != resultTable->end()) {
+            // we have a register!
+            switch (regCandidate->second) {
+            case eax:
+                ss << "%eax";
+            case ebx:
+                ss << "%ebx";
+            case ecx:
+                ss << "%ecx";
+            case edx:
+                ss << "%edx";
+            default:
+                break;
+            }
+        } else {
+            // otherwise, look in the memory table for the pointer location
+            auto offsetCandidate = offsetTable->find(instPtr);
+
+            if (offsetCandidate != offsetTable->end()) {
+                ss << "%ebp -" << offsetCandidate->second;
+            }
+        }
     }
     return ss.str();
 }

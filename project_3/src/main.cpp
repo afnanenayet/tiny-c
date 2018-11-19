@@ -4,6 +4,7 @@
 #include <llvm/IRReader/IRReader.h>
 
 #include "LLVMUtils.h"
+#include "codegen.h"
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -14,5 +15,8 @@ int main(int argc, char *argv[]) {
     // parse module file
     auto context = llvm::LLVMContext();
     auto module = loadModule(argv[1], context);
+
+    // run generation method
+    codeGen(module); 
     return 0;
 }

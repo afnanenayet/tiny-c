@@ -19,7 +19,7 @@
  * Given some LLVM module, run code generation on the module for each basic
  * block.
  */
-void codegenModule(llvm::Module &module);
+void codeGen(std::unique_ptr<llvm::Module> &module);
 
 /*!
  * \brief A register allocation class for a basic block

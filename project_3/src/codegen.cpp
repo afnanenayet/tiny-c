@@ -5,8 +5,8 @@
 #include "LLVMUtils.h"
 #include "codegen.h"
 
-void codegenModule(llvm::Module &module) {
-    for (auto &func : module) {
+void codeGen(std::unique_ptr<llvm::Module> &module) {
+    for (auto &func : *module) {
         for (auto &bb : func) {
             auto regAlloc = RegisterAllocator(&bb);
             regAlloc.gen();

@@ -42,15 +42,9 @@ class RegisterAllocator {
      * Initialize the register allocation class for a given basic 
      * Initialize the register allocation class for a given basic block
      *
-     * \param[in] bb A pointer to the basi
-                      m[in] bb A pointer to the basi
-       
-                                 block
-          
-                                     * \p
-                  
-                                ram[in] offsets The offset table for this basic block, which is
-     * constant across a function.
+     * \param[in] bb A pointer to the basic block
+     * \param[in] offsets A pointer to the offset table
+     * \param[in] labels The assembly labels for each basic block
      */
     RegisterAllocator(const llvm::BasicBlock *bb,
             std::shared_ptr<OffsetTable> &offsets,

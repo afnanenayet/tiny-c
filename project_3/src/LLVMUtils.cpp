@@ -258,3 +258,13 @@ getOverlappingOps(const llvm::Instruction *inst,
     }
     return overlapping;
 }
+
+bool isArithmeticInst(const llvm::Instruction &inst) {
+    auto op = inst.getOpcode();
+
+    // use the enums rather than the actual integer opcode because they can
+    // change based on which LLVM version you're using
+    return op == llvm::Instruction::Add ||
+           op == llvm::Instruction::Sub ||
+           op == llvm::Instruction::Mul;
+}

@@ -189,3 +189,21 @@ void printUMap(const std::unordered_map<K, V> &m) {
     }
     std::cout << "\n}";
 }
+
+/**
+ * \brief Return whether an instruction is an arithmetic instruction
+ *
+ * Determine whether an instruction is an IR arithmetic instruction.
+ * An arithmetic instruction is defined as an instruction that can be of the
+ * following LLVM IR/Instruction types:
+ *     - llvm::Add (addition)
+ *     - llvm::Sub (subtraction)
+ *     - llvm::Mul (multiplication)
+ *
+ * These types were determined based on the instructions that are available
+ * for use according to the instructions.
+ *
+ * \param[in] The instruction to inspect
+ * \returns Wheether the instruction is an arithmetic instruction
+ */
+bool isArithmeticInst(const llvm::Instruction &inst);

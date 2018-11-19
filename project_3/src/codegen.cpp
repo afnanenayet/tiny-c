@@ -59,27 +59,10 @@ void RegisterAllocator::gen() {
                 registerUsed = true;
         }
 
-        // actual code generation below!!!
-        //
-        // Whittle down the possible candidates for ASM based on the attributes
-        // of the LLVM instruction
-        // For example, if a register is used, then we are only looking at
-        // assembly instructions that involve a register, etc.
-        if (registerUsed) {
-            if (numOperands == 1) {
-
-            } else if (numOperands == 2) {
-                switch (inst.getOpcode()) {
-                case llvm::Instruction::Add:
-                    break;
-                case llvm::Instruction::Sub:
-                    break;
-                case llvm::Instruction::Mul:
-                    break;
-                }
-            }
-        } else {
-        }
+        // Based on the instruction, determine what kind of assembly
+        // instruction to generate, and perform the necessary register
+        // twiddling operations, based on whether we need to spill registers
+        // or otherwise move memory around
     }
 }
 

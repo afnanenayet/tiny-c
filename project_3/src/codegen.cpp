@@ -2,6 +2,7 @@
 #include <iostream>
 #include <optional>
 
+#include <llvm/IR/InstrTypes.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Module.h>
 
@@ -92,6 +93,7 @@ void RegisterAllocator::gen() {
             if (destLabel == labelTable->end())
                 throw std::runtime_error(
                     "Could not find basic block in label table");
+            auto destLabelStr = destLabel->second;
 
             // If the branch is conditional, then perform whichever compare/jump
             // instruction is necessary for that condition.
@@ -100,9 +102,39 @@ void RegisterAllocator::gen() {
                 // First, generate the cmp instruction to set up the conditional
                 // jump. If the first operand is not a constant, move it to a
                 // register.
+                auto condition =
+                    static_cast<llvm::CmpInst *>(branchInst->getCondition());
 
+                // Generate the proper jump instruction for the comparison.
+                // We are only generating cases that correspond to the jump
+                // variants listed in the instructions. We are also only
+                // dealing with signed integers, according to the
+                // instructions.
+                switch (condition->getPredicate()) {
+                case llvm::CmpInst::ICMP_EQ:
+                    std::cout << "je " << destLabelStr << "\n";
+                    break;
+                case llvm::CmpInst::ICMP_NE:
+                    std::cout << "jne " << destLabelStr << "\n";
+                    break;
+                case llvm::CmpInst::ICMP_SLE:
+                    std::cout << "jle " << destLabelStr << "\n";
+                    break;
+                case llvm::CmpInst::ICMP_SLT:
+                    std::cout << "jl " << destLabelStr << "\n";
+                    break;
+                case llvm::CmpInst::ICMP_SGE:
+                    std::cout << "jge " << destLabelStr << "\n";
+                    break;
+                case llvm::CmpInst::ICMP_SGT:
+                    std::cout << "jg " << destLabelStr << "\n";
+                    break;
+                default:
+                    // silently ignore unsupported comparisons
+                    break;
+                }
             } else {
-                std::cout << "jmp " << destLabel->second << "\n";
+                std::cout << "jmp " << destLabelStr << "\n";
             }
         }
     }

@@ -221,7 +221,6 @@ genResultTable(const llvm::BasicBlock &bb,
                     "register table");
 
             registerEntry->second.erase(selectedRegister);
-            std::cout << "erasing register " << selectedRegister << "\n";
         }
     }
     return results;

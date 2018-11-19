@@ -11,7 +11,7 @@ void codeGen(std::unique_ptr<llvm::Module> &module) {
     // first, generate the labels for each basic block
     // (TODO)
     auto labels = std::make_shared<LabelTable>();
-    
+
     for (auto &func : *module) {
         auto offsets = genOffsetTable(func);
         for (auto &bb : func) {
@@ -63,7 +63,7 @@ void RegisterAllocator::gen() {
 
             // if the instruction is a branch instruction, check whether it's
             // conditional
-            auto branchInst = static_cast<const llvm::BranchInst *>(&inst);            
+            auto branchInst = static_cast<const llvm::BranchInst *>(&inst);
 
             // The destination basic block for the jump
             auto destBB =

@@ -75,10 +75,9 @@ void tableInit(const llvm::BasicBlock &bb,
         // exists in the interval table
         for (auto user : inst.users()) {
             // ignore constant or memory (alloca instruction)
-            if (llvm::dyn_cast<llvm::Constant>(user) != nullptr ||
-                llvm::dyn_cast<llvm::AllocaInst>(user) != nullptr) {
+            if (llvm::isa<llvm::Constant>(user) ||
+                llvm::isa<llvm::AllocaInst>(user))
                 continue;
-            }
             if (const auto opInst = llvm::dyn_cast<llvm::Instruction>(user)) {
                 // check if the operand already exists in the liveliness table
                 auto searchIt = intervalTable->find(opInst);

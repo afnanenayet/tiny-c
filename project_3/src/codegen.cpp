@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <iostream>
+#include <optional>
 
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Module.h>
@@ -50,6 +51,20 @@ void RegisterAllocator::gen() {
         if (x != resultTable->end())
             resultRegister = x->second;
 
+        // In these code examples, there are at most two operands, so set them
+        // here for convenience. We use std optional because it's available in
+        // C++17 and offers more safety than directly dealing with nullptr. It
+        // also has much more graceful error saving options.
+        std::optional<const llvm::Instruction *> operand0 = std::nullopt;
+        std::optional<const llvm::Instruction *> operand1 = std::nullopt;
+
+        if (inst.getNumOperands() > 0)
+            operand0 =
+                static_cast<const llvm::Instruction *>(inst.getOperand(0));
+        if (inst.getNumOperands() > 1)
+            operand1 =
+                static_cast<const llvm::Instruction *>(inst.getOperand(0));
+
         // Based on the instruction, determine what kind of assembly
         // instruction to generate, and perform the necessary register
         // twiddling operations, based on whether we need to spill registers
@@ -80,6 +95,8 @@ void RegisterAllocator::gen() {
             // instruction is necessary for that condition.
             // Otherwise, just dump the jmp instruction.
             if (branchInst->isConditional()) {
+                // First, generate the cmp instruction to set up the conditional
+                // jump
             } else {
                 std::cout << "jmp " << destLabel->second << "\n";
             }

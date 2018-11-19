@@ -183,9 +183,9 @@ getOverlappingOps(const llvm::Instruction *inst,
  */
 template <typename K, typename V>
 void printUMap(const std::unordered_map<K, V> &m) {
-    std::cout << "\n\n{\n";
+    std::cout << "{\n";
     for (const auto &p : m) {
         std::cout << "\t" << p.first << " : " << p.second << "\n";
     }
-    std::cout << "\n}\n\n";
+    std::cout << "\n}";
 }

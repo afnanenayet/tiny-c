@@ -27,7 +27,7 @@ void RegisterAllocator::generateTables() {
     indexTable = genIndexTable(*basicBlock);
     tableInit(*basicBlock, indexTable, intervalTable, registerTable);
     sortedIntervals = sortIntervalMap(intervalTable);
-    genResultTable(*basicBlock, registerTable, sortedIntervals);
+    resultTable = genResultTable(*basicBlock, registerTable, sortedIntervals);
 
     // TODO remove
     printTables();
@@ -62,6 +62,9 @@ void RegisterAllocator::printTables() {
         std::cout << "\t" << entry.first << " : (" << std::get<0>(entry.second)
                   << ", " << std::get<1>(entry.second) << ")\n";
     }
+
+    std::cout << "\n\nresultTable:\n";
+    printUMap(*resultTable);
 }
 
 void RegisterAllocator::initializeMembers() {

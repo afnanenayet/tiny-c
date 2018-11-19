@@ -92,10 +92,12 @@ void tableInit(const llvm::BasicBlock &bb,
                 // This will throw an error if the instructions aren't in the
                 // index table, but that would be a logic error so that means
                 // the indexTable isn't being constructed properly
-                //auto interval = std::make_pair(indexTable->find(opInst)->second,
-                                               //indexTable->find(&inst)->second);
-                auto interval = std::make_pair(indexTable->find(&inst)->second,
-                        indexTable->find(opInst)->second);
+                // auto interval =
+                // std::make_pair(indexTable->find(opInst)->second,
+                // indexTable->find(&inst)->second);
+                auto interval =
+                    std::make_pair(indexTable->find(&inst)->second,
+                                   indexTable->find(opInst)->second);
                 intervalTable->insert(std::make_pair(opInst, interval));
 
                 // insert all of the physical registers for this operand
@@ -142,13 +144,12 @@ genResultTable(const llvm::BasicBlock &bb,
     auto results = std::make_shared<ResultTable>();
 
     // If the terminator instruction is a return instruction, take `%eax`
-    if (auto returnInst =
+    if (const auto &returnInst =
             llvm::dyn_cast<llvm::ReturnInst>(bb.getTerminator())) {
-        auto operand =
-            returnInst->getOperand(0); // TODO figure out if this is correct
+        const auto &operand = returnInst->getOperand(0);
+        auto operandInst = static_cast<llvm::Instruction *>(operand);
 
-        // convert back to instruction to add it to the hashtable
-        if (auto operandInst = llvm::dyn_cast<llvm::Instruction>(operand)) {
+        if (operandInst != nullptr) {
             results->insert(std::make_pair(operandInst, eax));
 
             // find every operand that overlaps with the current interval

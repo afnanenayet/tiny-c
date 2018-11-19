@@ -150,7 +150,7 @@ void RegisterAllocator::generateTables() {
     // printTables();
 }
 
-void RegisterAllocator::printTables() {
+void RegisterAllocator::printTables() const {
     std::cout << "\nindexTable:\n";
     printUMap(*indexTable);
 

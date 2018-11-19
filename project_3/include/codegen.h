@@ -90,10 +90,22 @@ class RegisterAllocator {
      * Print the contents of each table in the class to `stdout`. This
      * function should only be used for debugging purposes.
      */
-    void printTables();
+    void printTables() const;
 
     //! The basic block that's being operated on
     const llvm::BasicBlock *basicBlock;
+
+    /*!
+     * \brief Return the memory location for an operand
+     *
+     * Given some instruction, detect whether it's in a register, memory,
+     * or a constant, and convert it to proper notation for x86 GAS.
+     *
+     * \param[in] inst The instruction to find
+     * \returns A string representation of the memory location in x86 GAS
+     * format.
+     */
+    std::string findOp(const llvm::Instruction *inst) const;
 
     //! The offset table containing a mapping of instructions to their
     //! memory offsets

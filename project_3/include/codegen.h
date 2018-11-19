@@ -7,17 +7,21 @@
  * other helper/convenience utilities.
  */
 
+#include <string>
+
 #include <llvm/IR/Instruction.h>
 
 #include "LLVMUtils.h"
 
 #pragma once
 
+typedef std::unordered_map<const llvm::BasicBlock *, string> LabelTable;
+
 /*!
  * \brief Run code generation on an LLVM module
  *
  * Given some LLVM module, run code generation on the module for each basic
- * block.
+ * block within the module.
  */
 void codeGen(std::unique_ptr<llvm::Module> &module);
 
@@ -38,10 +42,12 @@ class RegisterAllocator {
      * Initialize the register allocation class for a given basic block
      *
      * \param[in] bb A pointer to the basic block
-     * \param[in] offsets The offset table for this basic block, which is 
+     * \param[in] offsets The offset table for this basic block, which is
      * constant across a function.
      */
-    RegisterAllocator(const llvm::BasicBlock *bb, std::shared_ptr<OffsetTable> &offsets);
+    RegisterAllocator(const llvm::BasicBlock *bb,
+            std::shared_ptr<OffsetTable> &offsets,
+            std::shared_ptr<LabelTable> &labels);
     ~RegisterAllocator();
 
     /*!
@@ -106,4 +112,7 @@ class RegisterAllocator {
 
     //! A list of sorted intervals for each instruction
     std::shared_ptr<SortedIntervalList> sortedIntervals;
+
+    //! A map of basic blocks and their corresponding labels in assembly
+    std::shared_ptr<LabelTable> labelTable;
 };

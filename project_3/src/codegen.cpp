@@ -8,6 +8,9 @@
 #include "codegen.h"
 
 void codeGen(std::unique_ptr<llvm::Module> &module) {
+    // first, generate the labels for each basic block
+    // (TODO)
+    
     for (auto &func : *module) {
         auto offsets = genOffsetTable(func);
         for (auto &bb : func) {
@@ -18,9 +21,11 @@ void codeGen(std::unique_ptr<llvm::Module> &module) {
 }
 
 RegisterAllocator::RegisterAllocator(const llvm::BasicBlock *bb,
-                                     std::shared_ptr<OffsetTable> &offsets) {
+                                     std::shared_ptr<OffsetTable> &offsets,
+                                     std::shared_ptr<LabelTable> &labels) {
     basicBlock = bb;
     offsetTable = offsets;
+    labelTable = labels;
     initializeMembers();
 }
 
@@ -44,25 +49,34 @@ void RegisterAllocator::gen() {
         if (x != resultTable->end())
             resultRegister = x->second;
 
-        // check and see if any of the operands or the current instruction have
-        // a result register
-        bool registerUsed = false;
-        int numOperands = inst.getNumOperands();
-
-        if (resultTable->find(&inst) != resultTable->end())
-            registerUsed = true;
-
-        for (int i = 0; i < numOperands; i++) {
-            auto operand = static_cast<llvm::Instruction *>(inst.getOperand(i));
-
-            if (resultTable->find(operand) != resultTable->end())
-                registerUsed = true;
-        }
-
         // Based on the instruction, determine what kind of assembly
         // instruction to generate, and perform the necessary register
         // twiddling operations, based on whether we need to spill registers
         // or otherwise move memory around
+        //
+        // The two main conditions we run into are whether the instruction is
+        // an arithmetic operation or if it is a branch instruction
+        if (isArithmeticInst(inst)) {
+            // TODO
+        } else if (llvm::isa<llvm::BranchInst>(inst)) {
+            // if the instruction is a branch instruction, check whether it's
+            // conditional
+            auto branchInst = static_cast<const llvm::BranchInst *>(&inst);            
+
+            // The destination basic block for the jump
+            auto destBB =
+                static_cast<const llvm::BasicBlock *>(inst.getOperand(0));
+
+            // the label for the section referred to by the basic block
+            //auto destLabel = labelTable->find(;
+
+            // If the branch is conditional, then perform whichever compare/jump
+            // instruction is necessary for that condition.
+            // Otherwise, just dump the jmp instruction.
+            if (branchInst->isConditional()) {
+            } else {
+            }
+        }
     }
 }
 

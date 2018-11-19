@@ -10,11 +10,12 @@
 void codeGen(std::unique_ptr<llvm::Module> &module) {
     // first, generate the labels for each basic block
     // (TODO)
+    auto labels = std::make_shared<LabelTable>();
     
     for (auto &func : *module) {
         auto offsets = genOffsetTable(func);
         for (auto &bb : func) {
-            auto regAlloc = RegisterAllocator(&bb, offsets);
+            auto regAlloc = RegisterAllocator(&bb, offsets, labels);
             regAlloc.gen();
         }
     }
@@ -59,6 +60,7 @@ void RegisterAllocator::gen() {
         if (isArithmeticInst(inst)) {
             // TODO
         } else if (llvm::isa<llvm::BranchInst>(inst)) {
+
             // if the instruction is a branch instruction, check whether it's
             // conditional
             auto branchInst = static_cast<const llvm::BranchInst *>(&inst);            
@@ -68,13 +70,18 @@ void RegisterAllocator::gen() {
                 static_cast<const llvm::BasicBlock *>(inst.getOperand(0));
 
             // the label for the section referred to by the basic block
-            //auto destLabel = labelTable->find(;
+            auto destLabel = labelTable->find(destBB);
+
+            if (destLabel == labelTable->end())
+                throw std::runtime_error(
+                    "Could not find basic block in label table");
 
             // If the branch is conditional, then perform whichever compare/jump
             // instruction is necessary for that condition.
             // Otherwise, just dump the jmp instruction.
             if (branchInst->isConditional()) {
             } else {
+                std::cout << "jmp " << destLabel->second << "\n";
             }
         }
     }

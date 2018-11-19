@@ -15,7 +15,7 @@
 
 #pragma once
 
-typedef std::unordered_map<const llvm::BasicBlock *, string> LabelTable;
+typedef std::unordered_map<const llvm::BasicBlock *, std::string> LabelTable;
 
 /*!
  * \brief Run code generation on an LLVM module
@@ -39,10 +39,17 @@ class RegisterAllocator {
     /*!
      * \brief Initialize a register allocator
      *
+     * Initialize the register allocation class for a given basic 
      * Initialize the register allocation class for a given basic block
      *
-     * \param[in] bb A pointer to the basic block
-     * \param[in] offsets The offset table for this basic block, which is
+     * \param[in] bb A pointer to the basi
+                      m[in] bb A pointer to the basi
+       
+                                 block
+          
+                                     * \p
+                  
+                                ram[in] offsets The offset table for this basic block, which is
      * constant across a function.
      */
     RegisterAllocator(const llvm::BasicBlock *bb,

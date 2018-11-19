@@ -55,15 +55,13 @@ void RegisterAllocator::gen() {
         // here for convenience. We use std optional because it's available in
         // C++17 and offers more safety than directly dealing with nullptr. It
         // also has much more graceful error saving options.
-        std::optional<const llvm::Instruction *> operand0 = std::nullopt;
-        std::optional<const llvm::Instruction *> operand1 = std::nullopt;
+        std::optional<const llvm::Value *> operand0 = std::nullopt;
+        std::optional<const llvm::Value *> operand1 = std::nullopt;
 
         if (inst.getNumOperands() > 0)
-            operand0 =
-                static_cast<const llvm::Instruction *>(inst.getOperand(0));
+            operand0 = inst.getOperand(0);
         if (inst.getNumOperands() > 1)
-            operand1 =
-                static_cast<const llvm::Instruction *>(inst.getOperand(0));
+            operand1 = inst.getOperand(1);
 
         // Based on the instruction, determine what kind of assembly
         // instruction to generate, and perform the necessary register
@@ -80,9 +78,13 @@ void RegisterAllocator::gen() {
             // conditional
             auto branchInst = static_cast<const llvm::BranchInst *>(&inst);
 
+            if (!operand0.has_value())
+                throw std::runtime_error(
+                    "Could not get operand for branch instruction");
+
             // The destination basic block for the jump
             auto destBB =
-                static_cast<const llvm::BasicBlock *>(inst.getOperand(0));
+                static_cast<const llvm::BasicBlock *>(operand0.value());
 
             // the label for the section referred to by the basic block
             auto destLabel = labelTable->find(destBB);
@@ -96,7 +98,9 @@ void RegisterAllocator::gen() {
             // Otherwise, just dump the jmp instruction.
             if (branchInst->isConditional()) {
                 // First, generate the cmp instruction to set up the conditional
-                // jump
+                // jump. If the first operand is not a constant, move it to a
+                // register.
+
             } else {
                 std::cout << "jmp " << destLabel->second << "\n";
             }

@@ -14,6 +14,14 @@
 #pragma once
 
 /*!
+ * \brief Run code generation on an LLVM module
+ *
+ * Given some LLVM module, run code generation on the module for each basic
+ * block.
+ */
+void codegenModule(llvm::Module &module);
+
+/*!
  * \brief A register allocation class for a basic block
  *
  * This class contains routines and has member variables with data pertinent
@@ -33,6 +41,13 @@ class RegisterAllocator {
      */
     RegisterAllocator(const llvm::BasicBlock *bb);
     ~RegisterAllocator();
+
+    /*!
+     * \brief Perform code generation
+     *
+     * Perform the code generation step on the basic block.
+     */
+    void gen();
 
   private:
     /*!
@@ -59,6 +74,14 @@ class RegisterAllocator {
      * externally so that they can be consumed by other functions.
      */
     void initializeMembers();
+
+    /*!
+     * \brief Print the contents of the information tables to `stdout`
+     *
+     * Print the contents of each table in the class to `stdout`. This
+     * function should only be used for debugging purposes.
+     */
+    void printTables();
 
     //! The basic block that's being operated on
     const llvm::BasicBlock *basicBlock;

@@ -11,9 +11,16 @@
 #include "LLVMUtils.h"
 #include "codegen.h"
 
+// TODO
+// - print directives (copy from example code)
+// - dedup load instructions
+// - handle load, store instructions
+// - labels
+// - arithmetic instructions
+
 void codeGen(std::unique_ptr<llvm::Module> &module) {
-    // first, generate the labels for each basic block
-    // (TODO)
+    // first, generate the labels for each basic block TODO
+    // remove duplicate loads for each basic block TODO
     auto labels = std::make_shared<LabelTable>();
 
     for (auto &func : *module) {
@@ -74,9 +81,24 @@ void RegisterAllocator::gen() {
         // The two main conditions we run into are whether the instruction is
         // an arithmetic operation or if it is a branch instruction
         if (isArithmeticInst(inst)) {
-            // TODO
-        } else if (llvm::isa<llvm::BranchInst>(inst)) {
+            // if there is no register assigned for this instruction, then
+            // there is no result for this particular instruction
 
+            auto result = resultTable->find(&inst);
+
+            // If there is no result, then we need to find some register to
+            // use for the instruction. Pick a register that isn't being used
+            // by an operand and spill it.
+            if (result == resultTable->end()) {
+                // TODO pick a register, indicate that we need to pop it later
+                // create a pushl/popl instruction
+            }
+
+            // TODO
+            // check if the second operand is in a register:
+            //     - if not, copy it to the result register then push back to memory
+            //     - if it is, copy the result to another register
+        } else if (llvm::isa<llvm::BranchInst>(inst)) {
             // if the instruction is a branch instruction, check whether it's
             // conditional
             auto branchInst = static_cast<const llvm::BranchInst *>(&inst);

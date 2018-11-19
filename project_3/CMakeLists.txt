@@ -19,9 +19,9 @@ add_definitions(${LLVM_DEFINITIONS})
 
 # Clang doesn't require any flags to link std::filesystem, but GCC does
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_FXX_FLAGS} -Werror -Wall -Wpedantic -lstdc++fs")
+    set(CMAKE_CXX_FLAGS "${CMAKE_FXX_FLAGS} -Wall -Wpedantic -lstdc++fs")
 else ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_FXX_FLAGS} -Werror -Wall -Wpedantic -lstdc++fs")
+    set(CMAKE_CXX_FLAGS "${CMAKE_FXX_FLAGS} -Wall -Wpedantic -lstdc++fs")
 endif()
 
 option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)" ON)

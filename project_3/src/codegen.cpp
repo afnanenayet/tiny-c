@@ -101,9 +101,16 @@ void RegisterAllocator::gen() {
             // instruction is necessary for that condition.
             // Otherwise, just dump the jmp instruction.
             if (branchInst->isConditional()) {
+                if (!operand0.has_value() || !operand1.has_value())
+                    throw std::runtime_error("Could not find both operands for "
+                                             "conditional instruction");
+
                 // First, generate the cmp instruction to set up the conditional
                 // jump. If the first operand is not a constant, move it to a
                 // register.
+                std::cout << "cmpl " << findOp(*operand0.value()) << ", "
+                          << findOp(*operand1.value()) << "\n";
+
                 auto condition =
                     static_cast<llvm::CmpInst *>(branchInst->getCondition());
 

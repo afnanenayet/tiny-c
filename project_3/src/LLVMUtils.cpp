@@ -92,8 +92,10 @@ void tableInit(const llvm::BasicBlock &bb,
                 // This will throw an error if the instructions aren't in the
                 // index table, but that would be a logic error so that means
                 // the indexTable isn't being constructed properly
-                auto interval = std::make_pair(indexTable->find(opInst)->second,
-                                               indexTable->find(&inst)->second);
+                //auto interval = std::make_pair(indexTable->find(opInst)->second,
+                                               //indexTable->find(&inst)->second);
+                auto interval = std::make_pair(indexTable->find(&inst)->second,
+                        indexTable->find(opInst)->second);
                 intervalTable->insert(std::make_pair(opInst, interval));
 
                 // insert all of the physical registers for this operand
@@ -127,7 +129,7 @@ sortIntervalMap(const std::shared_ptr<IntervalTable> &table) {
 
                   // returning a > b will sort the vector in descending order
                   // since the default is a < b
-                  return aLength > bLength;
+                  return std::abs(aLength) > std::abs(bLength);
               });
     return sortedMap;
 }
@@ -219,6 +221,7 @@ genResultTable(const llvm::BasicBlock &bb,
                     "register table");
 
             registerEntry->second.erase(selectedRegister);
+            std::cout << "erasing register " << selectedRegister << "\n";
         }
     }
     return results;

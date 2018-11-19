@@ -101,4 +101,7 @@ class RegisterAllocator {
 
     //! A mapping of instructions to their register
     std::shared_ptr<RegisterTable> registerTable;
+
+    //! A list of sorted intervals for each instruction
+    std::shared_ptr<SortedIntervalList> sortedIntervals;
 };

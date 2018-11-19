@@ -26,15 +26,42 @@ void RegisterAllocator::gen() { generateTables(); }
 void RegisterAllocator::generateTables() {
     indexTable = genIndexTable(*basicBlock);
     tableInit(*basicBlock, indexTable, intervalTable, registerTable);
+    sortedIntervals = sortIntervalMap(intervalTable);
+    genResultTable(*basicBlock, registerTable, sortedIntervals);
 
     // TODO remove
     printTables();
 }
 
 void RegisterAllocator::printTables() {
-    std::cout << "\nindexTable:\n" << indexTable << "\n";
-    std::cout << "\nintervalTable:\n" << intervalTable << "\n";
-    std::cout << "\nregisterTable:\n" << registerTable << "\n";
+    std::cout << "\nindexTable:\n";
+    printUMap(*indexTable);
+
+    std::cout << "\n\nintervalTable:\n";
+
+    for (const auto &p : *intervalTable) {
+        std::cout << "\t" << p.first << " : ( " << std::get<0>(p.second) << ", "
+                  << std::get<1>(p.second) << ")\n";
+    }
+
+    std::cout << "\n\nregisterTable:\n";
+    for (const auto &p : *registerTable) {
+        std::cout << "\t" << p.first << " : ";
+        std::cout << "(";
+
+        for (const auto &reg : p.second) {
+            std::cout << static_cast<int>(reg) << ", ";
+        }
+        std::cout << ")\n";
+    }
+    std::cout << std::endl;
+
+    std::cout << "\n\nsortedIntervals:\n";
+
+    for (const auto &entry : *sortedIntervals) {
+        std::cout << "\t" << entry.first << " : (" << std::get<0>(entry.second)
+                  << ", " << std::get<1>(entry.second) << ")\n";
+    }
 }
 
 void RegisterAllocator::initializeMembers() {

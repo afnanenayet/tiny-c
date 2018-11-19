@@ -7,6 +7,7 @@
  * Convenience/helper functions that help parse and interact with LLVM IR in
  * the context of global register allocation
  */
+#include <iostream>
 #include <map>
 #include <set>
 #include <string>
@@ -174,3 +175,17 @@ genResultTable(const llvm::BasicBlock &bb,
 std::unique_ptr<std::vector<const llvm::Instruction *>>
 getOverlappingOps(const llvm::Instruction *inst,
                   const std::shared_ptr<SortedIntervalList> &intervals);
+
+/*!
+ * \brief Print the contents of a hashmap
+ *
+ * Given some hashmap, pretty print the contents of the map to stdout.
+ */
+template <typename K, typename V>
+void printUMap(const std::unordered_map<K, V> &m) {
+    std::cout << "\n\n{\n";
+    for (const auto &p : m) {
+        std::cout << "\t" << p.first << " : " << p.second << "\n";
+    }
+    std::cout << "\n}\n\n";
+}

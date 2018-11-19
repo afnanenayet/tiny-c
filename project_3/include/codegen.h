@@ -105,7 +105,7 @@ class RegisterAllocator {
      * \returns A string representation of the memory location in x86 GAS
      * format.
      */
-    std::string findOp(const llvm::Instruction *inst) const;
+    std::string findOp(const llvm::Value &inst) const;
 
     //! The offset table containing a mapping of instructions to their
     //! memory offsets

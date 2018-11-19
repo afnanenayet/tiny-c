@@ -1,7 +1,9 @@
 #include <cstdio>
 #include <iostream>
 #include <optional>
+#include <sstream>
 
+#include <llvm/IR/Constants.h>
 #include <llvm/IR/InstrTypes.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Module.h>
@@ -188,4 +190,17 @@ void RegisterAllocator::initializeMembers() {
     indexTable = std::make_shared<IndexTable>();
     intervalTable = std::make_shared<IntervalTable>();
     registerTable = std::make_shared<RegisterTable>();
+}
+
+std::string RegisterAllocator::findOp(const llvm::Value &inst) const {
+    std::stringstream ss;
+    // first, check if the instruction is a constant
+    if (llvm::isa<llvm::Constant>(inst)) {
+        // making the assumption that the value is a signed 32 bit integer
+        if (auto val = llvm::dyn_cast<llvm::ConstantInt>(&inst)) {
+            ss << "$";
+            ss << val->getSExtValue();
+        }
+    }
+    return ss.str();
 }

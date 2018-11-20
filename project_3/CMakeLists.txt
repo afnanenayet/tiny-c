@@ -33,9 +33,6 @@ if (${FORCE_COLORED_OUTPUT})
     endif ()
 endif ()
 
-# for convenience when referencing the libraries
-llvm_map_components_to_libnames(llvm_libs support core irreader)
-
 include_directories(
     ${LLVM_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -47,8 +44,4 @@ add_executable(${program_name}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/codegen.cpp
     )
 
-target_link_libraries(${program_name}
-    ${llvm_libs}
-    ${core}
-    ${irreader}
-    )
+target_link_libraries(${program_name} LLVM)

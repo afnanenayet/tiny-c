@@ -117,7 +117,7 @@ void RegisterAllocator::gen() {
                         usedRegisters.insert(reg);
                         spilledRegisters.push_back(reg);
 
-                        // generate instruction to spill the register so it can 
+                        // generate instruction to spill the register so it can
                         // be set
                         std::cout << "pushl " << registerString(reg) << "\n";
                         break;

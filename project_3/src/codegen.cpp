@@ -12,9 +12,6 @@
 #include "LLVMUtils.h"
 #include "codegen.h"
 
-// TODO
-// - handle load, store instructions
-
 void codeGen(std::unique_ptr<llvm::Module> &module) {
     auto labels = std::make_shared<LabelTable>();
 
@@ -240,6 +237,22 @@ void RegisterAllocator::gen() {
             } else {
                 std::cout << "jmp " << destLabelStr << "\n";
             }
+        } else if (llvm::isa<llvm::LoadInst>(inst)) {
+            auto load = static_cast<const llvm::LoadInst *>(&inst);
+            const llvm::Value *valOp = nullptr;
+            auto ptrOp = load->getPointerOperand();
+
+            if (operand0.has_value()) {
+                valOp = operand0.value();
+                std::cout << "movl " << findOp(*ptrOp) << ", " << findOp(*valOp)
+                          << "\n";
+            }
+        } else if (llvm::isa<llvm::StoreInst>(inst)) {
+            auto store = static_cast<const llvm::StoreInst *>(&inst);
+            auto ptrOp = store->getPointerOperand();
+            auto valOp = store->getValueOperand();
+            std::cout << "movl " << findOp(*ptrOp) << ", " << findOp(*valOp)
+                      << "\n";
         }
     }
 }

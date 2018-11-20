@@ -40,7 +40,7 @@ void codeGen(std::unique_ptr<llvm::Module> &module) {
             std::cout << labels->find(&bb)->second << ":\n";
 
             // deduplicate the load instructions in the basic block
-            loadDedup(bb);
+            // loadDedup(bb);
 
             // generate assembly for the basic block
             auto regAlloc = RegisterAllocator(&bb, offsets, labels);
@@ -341,7 +341,7 @@ std::string RegisterAllocator::findOp(const llvm::Value &inst) const {
             auto offsetCandidate = offsetTable->find(instPtr);
 
             if (offsetCandidate != offsetTable->end()) {
-                ss << "%ebp -" << offsetCandidate->second;
+                ss << "%ebp" << offsetCandidate->second;
             }
         }
     }

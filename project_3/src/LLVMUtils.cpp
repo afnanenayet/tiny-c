@@ -308,6 +308,7 @@ void loadDedup(llvm::BasicBlock &bb) {
                     }
                 }
             }
+            break;
         }
     }
     for (auto val : toDelete) {

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <optional>
 #include <sstream>
+#include <set>
 
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/InstrTypes.h>
@@ -47,6 +48,9 @@ void RegisterAllocator::gen() {
     // generate the metadata necessary to perform code generation
     generateTables();
 
+    // so we can iterate over all of the registers easily
+    std::vector<PhysicalRegister> allRegisters = {eax, ebx, ecx, edx};
+
     for (const auto &inst : *basicBlock) {
         // if an instruction is an alloc instruction, skip it
         if (llvm::isa<llvm::AllocaInst>(inst))
@@ -68,6 +72,12 @@ void RegisterAllocator::gen() {
         std::optional<const llvm::Value *> operand0 = std::nullopt;
         std::optional<const llvm::Value *> operand1 = std::nullopt;
 
+        // a list of register that we spilled that will have to be popped later
+        std::vector<PhysicalRegister> spilledRegisters;
+
+        // the registers in use
+        RegisterSet usedRegisters;
+
         if (inst.getNumOperands() > 0)
             operand0 = inst.getOperand(0);
         if (inst.getNumOperands() > 1)
@@ -83,20 +93,41 @@ void RegisterAllocator::gen() {
         if (isArithmeticInst(inst)) {
             // if there is no register assigned for this instruction, then
             // there is no result for this particular instruction
-
             auto result = resultTable->find(&inst);
+
+            // check which registers the operands are using
+            auto regA = resultTable->find(
+                static_cast<const llvm::Instruction *>(operand0.value()));
+            auto regB = resultTable->find(
+                static_cast<const llvm::Instruction *>(operand1.value()));
+
+            if (regA != resultTable->end())
+                usedRegisters.insert(regA->second);
+
+            if (regB != resultTable->end())
+                usedRegisters.insert(regB->second);
 
             // If there is no result, then we need to find some register to
             // use for the instruction. Pick a register that isn't being used
             // by an operand and spill it.
             if (result == resultTable->end()) {
-                // TODO pick a register, indicate that we need to pop it later
-                // create a pushl/popl instruction
-            }
+                for (auto reg : allRegisters) {
+                    if (usedRegisters.find(reg) != usedRegisters.end()) {
+                        resultRegister = reg;
+                        usedRegisters.insert(reg);
+                        spilledRegisters.push_back(reg);
 
+                        // generate instruction to spill the register so it can 
+                        // be set
+                        std::cout << "pushl " << registerString(reg) << "\n";
+                        break;
+                    }
+                }
+            }
             // TODO
             // check if the second operand is in a register:
-            //     - if not, copy it to the result register then push back to memory
+            //     - if not, copy it to the result register then push back to
+            //     memory
             //     - if it is, copy the result to another register
         } else if (llvm::isa<llvm::BranchInst>(inst)) {
             // if the instruction is a branch instruction, check whether it's

@@ -207,3 +207,11 @@ void printUMap(const std::unordered_map<K, V> &m) {
  * \returns Wheether the instruction is an arithmetic instruction
  */
 bool isArithmeticInst(const llvm::Instruction &inst);
+
+/*!
+ * \brief convert a physical register enum to its string representation
+ *
+ * \param[in] reg The register to convert
+ * \return The string representation of the register
+ */
+std::string registerString(PhysicalRegister reg);

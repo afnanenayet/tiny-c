@@ -264,7 +264,21 @@ bool isArithmeticInst(const llvm::Instruction &inst) {
 
     // use the enums rather than the actual integer opcode because they can
     // change based on which LLVM version you're using
-    return op == llvm::Instruction::Add ||
-           op == llvm::Instruction::Sub ||
+    return op == llvm::Instruction::Add || op == llvm::Instruction::Sub ||
            op == llvm::Instruction::Mul;
+}
+
+std::string registerString(PhysicalRegister reg) {
+    switch (reg) {
+    case eax:
+        return "eax";
+    case ebx:
+        return "ebx";
+    case ecx:
+        return "ecx";
+    case edx:
+        return "edx";
+    default:
+        return "";
+    }
 }

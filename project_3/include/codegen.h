@@ -26,6 +26,15 @@ typedef std::unordered_map<const llvm::BasicBlock *, std::string> LabelTable;
 void codeGen(std::unique_ptr<llvm::Module> &module);
 
 /*!
+ * \brief Print headers for a function
+ *
+ * Given some function, print the assembly function directives to stdout
+ *
+ * \param[in] func The function to inspect
+ */
+void printFnDirective(const llvm::Function &func);
+
+/*!
  * \brief A register allocation class for a basic block
  *
  * This class contains routines and has member variables with data pertinent
@@ -39,7 +48,7 @@ class RegisterAllocator {
     /*!
      * \brief Initialize a register allocator
      *
-     * Initialize the register allocation class for a given basic 
+     * Initialize the register allocation class for a given basic
      * Initialize the register allocation class for a given basic block
      *
      * \param[in] bb A pointer to the basic block
@@ -47,8 +56,8 @@ class RegisterAllocator {
      * \param[in] labels The assembly labels for each basic block
      */
     RegisterAllocator(const llvm::BasicBlock *bb,
-            std::shared_ptr<OffsetTable> &offsets,
-            std::shared_ptr<LabelTable> &labels);
+                      std::shared_ptr<OffsetTable> &offsets,
+                      std::shared_ptr<LabelTable> &labels);
     ~RegisterAllocator();
 
     /*!

@@ -13,12 +13,9 @@
 #include "codegen.h"
 
 // TODO
-// - print directives (copy from example code)
-// - dedup load instructions
 // - handle load, store instructions
 
 void codeGen(std::unique_ptr<llvm::Module> &module) {
-    // remove duplicate loads for each basic block TODO
     auto labels = std::make_shared<LabelTable>();
 
     for (auto &func : *module) {
@@ -38,7 +35,17 @@ void codeGen(std::unique_ptr<llvm::Module> &module) {
 
     for (auto &func : *module) {
         auto offsets = genOffsetTable(func);
+        printFnDirective(func);
+
+        // print the function directives
         for (auto &bb : func) {
+            // print the basic block label
+            std::cout << labels->find(&bb)->second << ":\n";
+
+            // deduplicate the load instructions in the basic block
+            loadDedup(bb);
+
+            // generate assembly for the basic block
             auto regAlloc = RegisterAllocator(&bb, offsets, labels);
             regAlloc.gen();
         }
@@ -326,4 +333,11 @@ std::string RegisterAllocator::findOp(const llvm::Value &inst) const {
         }
     }
     return ss.str();
+}
+
+void printFnDirective(const llvm::Function &func) {
+    auto name = func.getName();
+
+    std::cout << "\t.globl " << name.str() << "\n"
+              << "\t.type " << name.str() << ", @function\n";
 }

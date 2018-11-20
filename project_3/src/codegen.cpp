@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <iostream>
 #include <optional>
-#include <sstream>
 #include <set>
+#include <sstream>
 
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/InstrTypes.h>
@@ -108,8 +108,8 @@ void RegisterAllocator::gen() {
                 usedRegisters.insert(regB->second);
 
             // If there is no result, then we need to find some register to
-            // use for the instruction. Pick a register that isn't being used
-            // by an operand and spill it.
+            // use for the instruction destination. Pick a register that isn't
+            // being used by an operand and spill it.
             if (result == resultTable->end()) {
                 for (auto reg : allRegisters) {
                     if (usedRegisters.find(reg) != usedRegisters.end()) {
@@ -124,11 +124,29 @@ void RegisterAllocator::gen() {
                     }
                 }
             }
-            // TODO
-            // check if the second operand is in a register:
-            //     - if not, copy it to the result register then push back to
-            //     memory
-            //     - if it is, copy the result to another register
+
+            // copy the second operand to the result register
+            auto secondOpStr = findOp(*operand1.value());
+            std::cout << "movl " << registerString(resultRegister) << ", "
+                      << secondOpStr << "\n";
+
+            // do the add op
+            switch (inst.getOpcode()) {
+            case llvm::Instruction::Add:
+                std::cout << "addl";
+                break;
+            case llvm::Instruction::Sub:
+                std::cout << "subl";
+                break;
+            case llvm::Instruction::Mul:
+                std::cout << "imull";
+                break;
+            default:
+                std::cout << "unknown_arithmetic_op";
+                break;
+            }
+            std::cout << " " << findOp(*operand0.value()) << ", " << secondOpStr
+                      << "\n";
         } else if (llvm::isa<llvm::BranchInst>(inst)) {
             // if the instruction is a branch instruction, check whether it's
             // conditional

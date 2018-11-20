@@ -282,3 +282,36 @@ std::string registerString(PhysicalRegister reg) {
         return "";
     }
 }
+
+void loadDedup(llvm::BasicBlock &bb) {
+    std::vector<llvm::Value *> toDelete;
+
+    for (auto it = bb.begin(); it != bb.end(); it++) {
+        auto &inst = *it;
+        if (llvm::isa<llvm::LoadInst>(inst)) {
+            auto x = inst.getOperand(0);
+
+            for (; it != bb.end(); it++) {
+                auto &u = static_cast<llvm::Instruction &>(*it);
+
+                if (llvm::isa<llvm::StoreInst>(u)) {
+                    auto op2 = u.getOperand(1);
+
+                    if (op2 == x)
+                        break;
+                }
+
+                if (llvm::isa<llvm::LoadInst>(u)) {
+                    if (x == u.getOperand(0)) {
+                        u.replaceAllUsesWith(&inst);
+                        toDelete.push_back(&u);
+                    }
+                }
+            }
+        }
+    }
+    for (auto val : toDelete) {
+        auto inst = static_cast<llvm::Instruction *>(val);
+        inst->removeFromParent();
+    }
+}

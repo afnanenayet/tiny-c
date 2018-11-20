@@ -16,13 +16,25 @@
 // - print directives (copy from example code)
 // - dedup load instructions
 // - handle load, store instructions
-// - labels
-// - arithmetic instructions
 
 void codeGen(std::unique_ptr<llvm::Module> &module) {
-    // first, generate the labels for each basic block TODO
     // remove duplicate loads for each basic block TODO
     auto labels = std::make_shared<LabelTable>();
+
+    for (auto &func : *module) {
+        int bbCounter = 0;
+        for (auto &bb : func) {
+            if (&bb == &func.getEntryBlock()) {
+                // the entry basic block's name is the function name followed
+                // by a colon
+                labels->insert(std::make_pair(&bb, func.getName().str()));
+            }
+            // create bb label
+            std::stringstream ss;
+            ss << ".L" << bbCounter++;
+            labels->insert(std::make_pair(&bb, ss.str()));
+        }
+    }
 
     for (auto &func : *module) {
         auto offsets = genOffsetTable(func);
@@ -147,6 +159,11 @@ void RegisterAllocator::gen() {
             }
             std::cout << " " << findOp(*operand0.value()) << ", " << secondOpStr
                       << "\n";
+
+            // pop the stack back into each register
+            for (auto reg : usedRegisters) {
+                std::cout << "popl " << registerString(reg) << "\n";
+            }
         } else if (llvm::isa<llvm::BranchInst>(inst)) {
             // if the instruction is a branch instruction, check whether it's
             // conditional

@@ -215,3 +215,12 @@ bool isArithmeticInst(const llvm::Instruction &inst);
  * \return The string representation of the register
  */
 std::string registerString(PhysicalRegister reg);
+
+/*!
+ * \brief Remove redundant load ops from a basic block
+ *
+ * Given some basic block, remove redundant loads
+ *
+ * \param[out] bb The basic block to optimize
+ */
+void loadDedup(llvm::BasicBlock &bb);

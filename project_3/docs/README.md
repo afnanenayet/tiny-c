@@ -1,5 +1,21 @@
 # Part 3 (Register Allocation)
 
+## Summary
+
+This program takes in LLVM IR, which is parsed using the LLVM API,
+performs linear scan register allocation, and emits GCC assembly.
+It works on a subset of allowed input, and implements the following
+instructions:
+
+- `jmp` and variants (`jne`, `jg`, etc)
+- `movl`
+- `addl`
+- `subl`
+- `mull`
+
+and likely more that I can't remember (the arithmetic, `mov`, and comparison
+instructions are the major parts of the program).
+
 ## Usage
 
 To use this program, call the program and supply the input file

@@ -2,7 +2,9 @@
 
 ## Summary
 
-This directory contains the files for the overall project.
+This directory contains the files for part 1 of the project. It implements
+the parser and lexer using bison and flex, respectively, for a subset of
+the C programming language. It uses flex and bison to construct an AST.
 
 ## Development
 
